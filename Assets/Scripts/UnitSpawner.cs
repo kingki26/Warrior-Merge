@@ -1,19 +1,67 @@
 using UnityEngine;
 
-public class UnitSpawner : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    public Unit unitPrefab;
-    public GridCell spawnCell;
+    [Header("Player Cells")]
+    [SerializeField] private GridCell[] playerCells;
 
-    private void Start()
+    [Header("Unit Prefabs")]
+    [SerializeField] private Unit meleeLv1Prefab;
+    [SerializeField] private Unit rangedLv1Prefab;
+
+    [SerializeField] private Unit[] meleePrefabs;
+    [SerializeField] private Unit[] rangedPrefabs;
+
+    public void SpawnMelee()
     {
-        SpawnUnit();
+        Debug.Log("Spawn Melee button clicked!");
+
+        SpawnUnit(meleeLv1Prefab);
     }
 
-    public void SpawnUnit()
+    public void SpawnRanged()
     {
-        Unit newUnit = Instantiate(unitPrefab);
+        Debug.Log("Spawn Ranged button clicked!");
 
-        newUnit.SetCell(spawnCell);
+        SpawnUnit(rangedLv1Prefab);
+    }
+
+    private void SpawnUnit(Unit prefab)
+    {
+        if (prefab == null)
+        {
+            Debug.LogError("Unit prefab is NULL!");
+            return;
+        }
+
+        foreach (GridCell cell in playerCells)
+        {
+            if (!cell.IsOccupied)
+            {
+                Debug.Log("Found empty cell: " + cell.name);
+
+                Unit newUnit = Instantiate(prefab);
+                newUnit.SetCell(cell);
+
+                return;
+            }
+        }
+
+        Debug.Log("Player grid is full!");
+    }
+
+    public Unit GetNextLevelPrefab(Unit unit)
+    {
+        int nextLevel = unit.level + 1;
+
+        if (nextLevel > 5)
+            return null;
+
+        if (unit.unitType == UnitType.Melee)
+        {
+            return meleePrefabs[nextLevel - 1];
+        }
+
+        return rangedPrefabs[nextLevel - 1];
     }
 }

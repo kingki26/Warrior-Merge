@@ -1,28 +1,38 @@
 ﻿using UnityEngine;
 
+public enum UnitType
+{
+    Melee,
+    Ranged
+}
+
 public class Unit : MonoBehaviour
 {
+    [Header("Unit Info")]
+    public UnitType unitType;
+    public int level = 1;
+
     [Header("Cell")]
     public GridCell currentCell;
-    public void SetCell(GridCell newCell)
-    {
-        // Không có cell mới thì thôi
-        if (newCell == null)
-            return;
 
-        // Cell cũ không còn chứa Unit này
+    public bool SetCell(GridCell newCell)
+    {
+        if (newCell == null)
+            return false;
+
+        if (newCell.IsOccupied && newCell != currentCell)
+            return false;
+
         if (currentCell != null)
         {
             currentCell.RemoveUnit();
         }
 
-        // Cập nhật Cell mới
         currentCell = newCell;
-
-        // Đánh dấu Unit đang chiếm Cell mới
         currentCell.SetUnit(this);
 
-        // Snap Unit vào tâm Cell
         transform.position = newCell.transform.position;
+
+        return true;
     }
 }
