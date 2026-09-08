@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("Enemy Cells")]
+    [SerializeField] private GridCell[] enemyCells;
+
     [Header("Player Cells")]
     [SerializeField] private GridCell[] playerCells;
 
@@ -12,11 +15,23 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Unit[] meleePrefabs;
     [SerializeField] private Unit[] rangedPrefabs;
 
+    [SerializeField] private EnemySetup enemySetup;
+
     public void SpawnMelee()
     {
         Debug.Log("Spawn Melee button clicked!");
 
         SpawnUnit(meleeLv1Prefab);
+    }
+
+    public void StartFight()
+    {
+        enemySetup.StartFight();
+    }
+
+    public GridCell[] GetEnemyCells()
+    {
+        return enemyCells;
     }
 
     public void SpawnRanged()
@@ -63,5 +78,26 @@ public class GameManager : MonoBehaviour
         }
 
         return rangedPrefabs[nextLevel - 1];
+    }
+
+    public GridCell[] GetPlayerCells()
+    {
+        return playerCells;
+    }
+
+    public void StartPlayerCombat()
+    {
+        foreach (GridCell cell in playerCells)
+        {
+            if (!cell.IsOccupied)
+                continue;
+
+            UnitCombat combat = cell.currentUnit.GetComponent<UnitCombat>();
+
+            if (combat != null)
+            {
+                combat.StartCombat();
+            }
+        }
     }
 }

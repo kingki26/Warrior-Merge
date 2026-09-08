@@ -35,4 +35,18 @@ public class Unit : MonoBehaviour
 
         return true;
     }
+
+    public void FaceTarget(Transform target)
+    {
+        if (target == null)
+            return;
+
+        Vector3 direction = target.position - transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude > 0.001f)
+        {
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+    }
 }

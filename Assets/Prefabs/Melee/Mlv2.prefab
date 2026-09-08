@@ -141,6 +141,8 @@ GameObject:
   - component: {fileID: 3377913546511043551}
   - component: {fileID: -5740372477814434215}
   - component: {fileID: -6665130391227891330}
+  - component: {fileID: -3821742260471765287}
+  - component: {fileID: -2705355709416805022}
   m_Layer: 0
   m_Name: Mlv2
   m_TagString: Untagged
@@ -175,7 +177,7 @@ Animator:
   m_GameObject: {fileID: 858272626835077184}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a53d90bd82125054897d4991bba42f99, type: 3}
-  m_Controller: {fileID: 9100000, guid: 0e05ecb5cb0db58439637f885afefd7d, type: 2}
+  m_Controller: {fileID: 9100000, guid: e07b4cb391243524dbe8375cfe6eae1e, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -238,6 +240,35 @@ MonoBehaviour:
   gridCellLayer:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &-3821742260471765287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858272626835077184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10fc1ba4c204e15488a23a0e8e3522fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  moveSpeed: 2
+  attackRange: 2
+  attackCooldown: 1
+  damage: 10
+--- !u!114 &-2705355709416805022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858272626835077184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
+  maxHealth: 100
 --- !u!1 &1217244627013658503
 GameObject:
   m_ObjectHideFlags: 0
