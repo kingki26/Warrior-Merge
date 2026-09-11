@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,8 +17,13 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private EnemySetup enemySetup;
 
+    private bool isFighting;
+
     public void SpawnMelee()
     {
+        if (isFighting)
+            return;
+
         Debug.Log("Spawn Melee button clicked!");
 
         SpawnUnit(meleeLv1Prefab);
@@ -26,6 +31,10 @@ public class GameManager : MonoBehaviour
 
     public void StartFight()
     {
+        if (isFighting)
+            return;
+
+        isFighting = true;
         enemySetup.StartFight();
     }
 
@@ -36,6 +45,8 @@ public class GameManager : MonoBehaviour
 
     public void SpawnRanged()
     {
+        if (isFighting)
+            return;
         Debug.Log("Spawn Ranged button clicked!");
 
         SpawnUnit(rangedLv1Prefab);
@@ -97,6 +108,58 @@ public class GameManager : MonoBehaviour
             if (combat != null)
             {
                 combat.StartCombat();
+            }
+        }
+    }
+
+    public void CheckVictory()
+    {
+        foreach (GridCell cell in enemyCells)
+        {
+            if (cell.IsOccupied)
+            {
+                return;
+            }
+        }
+
+        Victory();
+    }
+
+    private void Victory()
+    {
+        Debug.Log("PLAYER VICTORY!");
+
+        // Dừng toàn bộ Player
+        foreach (GridCell cell in playerCells)
+        {
+            if (!cell.IsOccupied)
+                continue;
+
+            Unit unit = cell.currentUnit;
+
+            UnitCombat combat =
+                unit.GetComponent<UnitCombat>();
+
+            if (combat != null)
+            {
+                combat.StopCombat();
+            }
+        }
+
+        // Kích Victory cho Player
+        foreach (GridCell cell in playerCells)
+        {
+            if (!cell.IsOccupied)
+                continue;
+
+            Animator animator =
+                cell.currentUnit.GetComponent<Animator>();
+
+            if (animator != null)
+            {
+                animator.ResetTrigger("Attack");
+                animator.SetBool("IsMoving", false);
+                animator.SetTrigger("Victory");
             }
         }
     }

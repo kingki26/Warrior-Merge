@@ -8,20 +8,22 @@ public enum UnitType
 
 public class Unit : MonoBehaviour
 {
+    [Header("Cell")]
+    public GridCell currentCell;
+
     [Header("Unit Info")]
     public UnitType unitType;
     public int level = 1;
 
-    [Header("Cell")]
-    public GridCell currentCell;
+    [Header("Stats")]
+    public int maxHealth = 100;
+    public int damage = 10;
+    public float attackCooldown = 0.8f;
 
-    public bool SetCell(GridCell newCell)
+    public void SetCell(GridCell newCell)
     {
         if (newCell == null)
-            return false;
-
-        if (newCell.IsOccupied && newCell != currentCell)
-            return false;
+            return;
 
         if (currentCell != null)
         {
@@ -32,8 +34,6 @@ public class Unit : MonoBehaviour
         currentCell.SetUnit(this);
 
         transform.position = newCell.transform.position;
-
-        return true;
     }
 
     public void FaceTarget(Transform target)

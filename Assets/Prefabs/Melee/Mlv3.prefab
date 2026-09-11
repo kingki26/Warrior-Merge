@@ -459,9 +459,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb32ddb05b166a7429eaa5bd8ab5c477, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
+  currentCell: {fileID: 0}
   unitType: 0
   level: 3
-  currentCell: {fileID: 0}
+  maxHealth: 100
+  damage: 10
+  attackCooldown: 0.8
 --- !u!65 &939716333228234350
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -513,7 +516,7 @@ MonoBehaviour:
   moveSpeed: 2
   attackRange: 2
   attackCooldown: 1
-  damage: 10
+  damage: 20
 --- !u!114 &-2368607000639046941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -526,7 +529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
-  maxHealth: 100
+  maxHealth: 250
 --- !u!1 &5445855661990008616
 GameObject:
   m_ObjectHideFlags: 0

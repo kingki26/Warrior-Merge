@@ -6,6 +6,7 @@ public class UnitDrag : MonoBehaviour
     [SerializeField] private LayerMask gridCellLayer;
 
     private Unit unit;
+    private UnitCombat unitCombat;
     private GridCell originalCell;
 
     private bool isDragging;
@@ -14,11 +15,16 @@ public class UnitDrag : MonoBehaviour
     private void Awake()
     {
         unit = GetComponent<Unit>();
+        unitCombat = GetComponent<UnitCombat>();
     }
 
     private void OnMouseDown()
     {
         if (unit.currentCell == null)
+            return;
+
+        // Đang combat thì không cho kéo
+        if (unitCombat != null && unitCombat.IsFighting())
             return;
 
         isDragging = true;

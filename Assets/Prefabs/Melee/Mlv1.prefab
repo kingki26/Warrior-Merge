@@ -863,9 +863,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb32ddb05b166a7429eaa5bd8ab5c477, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
+  currentCell: {fileID: 0}
   unitType: 0
   level: 1
-  currentCell: {fileID: 0}
+  maxHealth: 100
+  damage: 10
+  attackCooldown: 0.8
 --- !u!65 &2991098812042992063
 BoxCollider:
   m_ObjectHideFlags: 0
