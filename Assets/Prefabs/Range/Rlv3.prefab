@@ -387,6 +387,8 @@ GameObject:
   - component: {fileID: 5815100690702636820}
   - component: {fileID: 7286378469136836818}
   - component: {fileID: -4744260121474157046}
+  - component: {fileID: 1144505815748557843}
+  - component: {fileID: 4725090311309820872}
   m_Layer: 0
   m_Name: Rlv3
   m_TagString: Untagged
@@ -409,6 +411,7 @@ Transform:
   m_Children:
   - {fileID: 535343298326240681}
   - {fileID: 3797824285610330750}
+  - {fileID: 2831137657062324635}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1886997211659397658
@@ -445,9 +448,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb32ddb05b166a7429eaa5bd8ab5c477, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
+  currentCell: {fileID: 0}
   unitType: 1
   level: 3
-  currentCell: {fileID: 0}
+  maxHealth: 150
+  damage: 40
+  attackCooldown: 0.8
 --- !u!65 &7286378469136836818
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -484,6 +490,35 @@ MonoBehaviour:
   gridCellLayer:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &1144505815748557843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4677655609337903312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
+  maxHealth: 150
+--- !u!114 &4725090311309820872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4677655609337903312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 730fdadc07c36d94eae13a0bbf3a3118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RangedCombat
+  detectionRange: 50
+  bulletPrefab: {fileID: 5643049157634691485, guid: 4a0a97cd00f0630479c3e08fd559f977, type: 3}
+  firePoint: {fileID: 2831137657062324635}
+  shootDelay: 0.6
 --- !u!1 &4799414860760454623
 GameObject:
   m_ObjectHideFlags: 0
@@ -642,6 +677,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7333236489082567767}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -19.889929}
+--- !u!1 &5777144913978422962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2831137657062324635}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2831137657062324635
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5777144913978422962}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.24, z: 1.62}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4494991460787046323}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5918927199986782352
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,7 +738,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 535343298326240681}
-  m_LocalEulerAnglesHint: {x: -40.06723, y: 24.428547, z: 62.205048}
+  m_LocalEulerAnglesHint: {x: -41.262077, y: 20.018402, z: 68.13007}
 --- !u!1 &6428902638042172247
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,7 +800,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2693897519353128076}
-  m_LocalEulerAnglesHint: {x: 0, y: -0.8254662, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -0.8254669, z: 0}
 --- !u!1 &6804996502635553881
 GameObject:
   m_ObjectHideFlags: 0
@@ -863,7 +929,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8689710925724805329}
-  m_LocalEulerAnglesHint: {x: -0.000006701574, y: 0.8253588, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.0000055697224, y: 0.8253595, z: 0}
 --- !u!1 &8254235185555728840
 GameObject:
   m_ObjectHideFlags: 0

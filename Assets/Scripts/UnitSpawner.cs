@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
             return;
 
         isFighting = true;
+
         enemySetup.StartFight();
     }
 
@@ -103,11 +104,30 @@ public class GameManager : MonoBehaviour
             if (!cell.IsOccupied)
                 continue;
 
-            UnitCombat combat = cell.currentUnit.GetComponent<UnitCombat>();
+            Unit unit = cell.currentUnit;
 
-            if (combat != null)
+            // =========================
+            // MELEE
+            // =========================
+
+            UnitCombat meleeCombat =
+                unit.GetComponent<UnitCombat>();
+
+            if (meleeCombat != null)
             {
-                combat.StartCombat();
+                meleeCombat.StartCombat();
+            }
+
+            // =========================
+            // RANGED
+            // =========================
+
+            RangedCombat rangedCombat =
+                unit.GetComponent<RangedCombat>();
+
+            if (rangedCombat != null)
+            {
+                rangedCombat.StartCombat();
             }
         }
     }

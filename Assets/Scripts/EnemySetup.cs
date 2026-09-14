@@ -24,11 +24,31 @@ public class EnemySetup : MonoBehaviour
     {
         foreach (Unit enemy in enemyUnits)
         {
-            UnitCombat combat = enemy.GetComponent<UnitCombat>();
+            if (enemy == null)
+                continue;
 
-            if (combat != null)
+            // =========================
+            // MELEE
+            // =========================
+
+            UnitCombat meleeCombat =
+                enemy.GetComponent<UnitCombat>();
+
+            if (meleeCombat != null)
             {
-                combat.StartCombat();
+                meleeCombat.StartCombat();
+            }
+
+            // =========================
+            // RANGED
+            // =========================
+
+            RangedCombat rangedCombat =
+                enemy.GetComponent<RangedCombat>();
+
+            if (rangedCombat != null)
+            {
+                rangedCombat.StartCombat();
             }
         }
 
