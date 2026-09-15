@@ -34,6 +34,28 @@ public class GameManager : MonoBehaviour
         if (isFighting)
             return;
 
+        bool hasPlayerUnit = false;
+
+        foreach (GridCell cell in playerCells)
+        {
+            if (cell.IsOccupied)
+            {
+                hasPlayerUnit = true;
+                break;
+            }
+        }
+
+        // Chưa có Unit → không bắt đầu Fight
+        if (!hasPlayerUnit)
+        {
+            Debug.Log("Cannot start fight! Player has no units.");
+            return;
+        }
+
+        // ========================================
+        // START FIGHT
+        // ========================================
+
         isFighting = true;
 
         enemySetup.StartFight();

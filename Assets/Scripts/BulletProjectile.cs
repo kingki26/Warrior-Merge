@@ -2,6 +2,10 @@
 
 public class BulletProjectile : MonoBehaviour
 {
+    [Header("Hit Effect")]
+    [SerializeField] private GameObject hitEffect;
+    [SerializeField] private float hitEffectDuration = 0.3f;
+
     [Header("Bullet Settings")]
     [SerializeField] private float speed = 15f;
     [SerializeField] private float hitDistance = 0.2f;
@@ -94,6 +98,37 @@ public class BulletProjectile : MonoBehaviour
 
     private void HitTarget()
     {
+
+        if (hitEffect != null)
+        {
+            GameObject effect;
+
+            if (target != null)
+            {
+                // Spawn effect trên Enemy
+                effect = Instantiate(
+                    hitEffect,
+                    target.transform.position,
+                    Quaternion.identity,
+                    target.transform
+                );
+            }
+            else
+            {
+                // Target đã bị Destroy
+                effect = Instantiate(
+                    hitEffect,
+                    transform.position,
+                    Quaternion.identity
+                );
+            }
+
+            // Tự hủy effect sau một khoảng thời gian
+            Destroy(
+                effect,
+                hitEffectDuration
+            );
+        }
         // Target đã chết / bị Destroy
         if (target == null)
         {
