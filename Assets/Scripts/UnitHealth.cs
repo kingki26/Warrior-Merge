@@ -44,11 +44,17 @@ public class UnitHealth : MonoBehaviour
         if (unit != null && unit.currentCell != null)
         {
             unit.currentCell.RemoveUnit();
-            GameManager gameManager = FindAnyObjectByType<GameManager>();
+
+            GameManager gameManager =
+                FindAnyObjectByType<GameManager>();
 
             if (gameManager != null)
             {
-                gameManager.CheckVictory();
+                if (unit.GetComponent<UnitHealth>() != null)
+                {
+                    gameManager.CheckVictory();
+                    gameManager.CheckDefeat();
+                }
             }
         }
 

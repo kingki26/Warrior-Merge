@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Unit[] rangedPrefabs;
 
     [SerializeField] private EnemySetup enemySetup;
+    [SerializeField] private VictoryUI victoryUI;
 
     private bool isFighting;
 
@@ -204,5 +205,114 @@ public class GameManager : MonoBehaviour
                 animator.SetTrigger("Victory");
             }
         }
+
+        // Hiện Victory UI
+        if (victoryUI != null)
+        {
+            victoryUI.ShowVictory();
+        }
+    }
+    public void CheckDefeat()
+    {
+        foreach (GridCell cell in playerCells)
+        {
+            if (cell.IsOccupied)
+            {
+                return;
+            }
+        }
+
+        Defeat();
+    }
+
+    private void Defeat()
+    {
+        Debug.Log("PLAYER DEFEAT!");
+
+        isFighting = false;
+
+        // TODO: Show Defeat UI
+    }
+    public void ResetPlayerForNextLevel()
+    {
+        Debug.Log("GameManager → Reset Player for next level");
+
+        foreach (GridCell cell in playerCells)
+        {
+            if (!cell.IsOccupied)
+                continue;
+
+            Unit unit = cell.currentUnit;
+
+            if (unit == null)
+                continue;
+
+            // ========================================
+            // STOP MELEE COMBAT
+            // ========================================
+
+            UnitCombat meleeCombat =
+                unit.GetComponent<UnitCombat>();
+
+            if (meleeCombat != null)
+            {
+                meleeCombat.StopCombat();
+            }
+
+            // ========================================
+            // STOP RANGED COMBAT
+            // ========================================
+
+            RangedCombat rangedCombat =
+                unit.GetComponent<RangedCombat>();
+
+            if (rangedCombat != null)
+            {
+                rangedCombat.StopCombat();
+            }
+
+            // ========================================
+            // RESET POSITION
+            // ========================================
+
+            if (unit.currentCell != null)
+            {
+                unit.transform.position =
+                    unit.currentCell.transform.position;
+            }
+
+            // ========================================
+            // RESET ROTATION
+            // ========================================
+
+            unit.transform.rotation =
+                unit.currentCell.transform.rotation;
+
+            // ========================================
+            // RESET ANIMATION
+            // ========================================
+
+            Animator animator =
+                unit.GetComponent<Animator>();
+
+            if (animator != null)
+            {
+                animator.ResetTrigger("Attack");
+                animator.ResetTrigger("Victory");
+
+                animator.SetBool(
+                    "IsMoving",
+                    false
+                );
+
+                animator.Play(
+                    "Idle",
+                    0,
+                    0f
+                );
+            }
+        }
+
+        isFighting = false;
     }
 }

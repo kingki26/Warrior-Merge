@@ -204,7 +204,7 @@ MonoBehaviour:
   currentCell: {fileID: 0}
   unitType: 0
   level: 2
-  maxHealth: 100
+  maxHealth: 200
   damage: 10
   attackCooldown: 0.8
 --- !u!65 &-5740372477814434215
