@@ -49,4 +49,57 @@ public class Unit : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direction);
         }
     }
+
+    public void ResetForReuse()
+    {
+        currentCell = null;
+
+        transform.rotation =
+            Quaternion.identity;
+
+        UnitHealth health =
+            GetComponent<UnitHealth>();
+
+        if (health != null)
+        {
+            health.ResetHealth();
+        }
+
+        UnitCombat meleeCombat =
+            GetComponent<UnitCombat>();
+
+        if (meleeCombat != null)
+        {
+            meleeCombat.StopCombat();
+        }
+
+        RangedCombat rangedCombat =
+            GetComponent<RangedCombat>();
+
+        if (rangedCombat != null)
+        {
+            rangedCombat.StopCombat();
+        }
+
+        Animator animator =
+            GetComponent<Animator>();
+
+        if (animator != null)
+        {
+            animator.ResetTrigger("Attack");
+            animator.ResetTrigger("Victory");
+            animator.ResetTrigger("Die");
+
+            animator.SetBool(
+                "IsMoving",
+                false
+            );
+
+            animator.Play(
+                "Idle",
+                0,
+                0f
+            );
+        }
+    }
 }

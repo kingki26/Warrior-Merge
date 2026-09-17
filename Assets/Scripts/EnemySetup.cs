@@ -6,10 +6,6 @@ public class EnemySetup : MonoBehaviour
     [Header("Enemy Cells")]
     [SerializeField] private GridCell[] spawnCells;
 
-    [Header("Enemy Prefabs")]
-    [SerializeField] private Unit[] meleePrefabs;
-    [SerializeField] private Unit[] rangedPrefabs;
-
     [Header("JSON")]
     [SerializeField]
     private string jsonFileName =
@@ -17,6 +13,7 @@ public class EnemySetup : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private UnitPool unitPool;
 
     private List<Unit> enemyUnits =
         new List<Unit>();
@@ -136,19 +133,14 @@ public class EnemySetup : MonoBehaviour
             return;
         }
 
-        Unit prefab =
-            GetEnemyPrefab(
-                unitType,
-                enemyData.level
-            );
+        // ========================================
+        // KIỂM TRA POOL
+        // ========================================
 
-        if (prefab == null)
+        if (unitPool == null)
         {
             Debug.LogError(
-                "EnemySetup → Prefab not found → " +
-                enemyData.type +
-                " Lv" +
-                enemyData.level
+                "EnemySetup → UnitPool is NULL!"
             );
 
             return;
@@ -184,7 +176,7 @@ public class EnemySetup : MonoBehaviour
             }
 
             SpawnEnemyAtCell(
-                prefab,
+                unitType,
                 cell,
                 enemyData.level
             );
@@ -205,17 +197,48 @@ public class EnemySetup : MonoBehaviour
     }
 
     private void SpawnEnemyAtCell(
-        Unit prefab,
+        UnitType unitType,
         GridCell cell,
         int level
     )
     {
+        // ========================================
+        // LẤY UNIT TỪ POOL
+        // ========================================
+
         Unit enemy =
-            Instantiate(prefab);
+            unitPool.GetUnit(
+                unitType,
+                level
+            );
+
+        if (enemy == null)
+        {
+            Debug.LogError(
+                "EnemySetup → Cannot get Enemy from Pool → " +
+                unitType +
+                " Lv" +
+                level
+            );
+
+            return;
+        }
+
+        // ========================================
+        // SET LEVEL
+        // ========================================
 
         enemy.level = level;
 
+        // ========================================
+        // ĐẶT VÀO CELL
+        // ========================================
+
         enemy.SetCell(cell);
+
+        // ========================================
+        // LƯU DANH SÁCH ENEMY
+        // ========================================
 
         enemyUnits.Add(enemy);
 
@@ -249,30 +272,6 @@ public class EnemySetup : MonoBehaviour
         return null;
     }
 
-    private Unit GetEnemyPrefab(
-        UnitType unitType,
-        int level
-    )
-    {
-        int index = level - 1;
-
-        if (index < 0)
-            return null;
-
-        if (unitType == UnitType.Melee)
-        {
-            if (index >= meleePrefabs.Length)
-                return null;
-
-            return meleePrefabs[index];
-        }
-
-        if (index >= rangedPrefabs.Length)
-            return null;
-
-        return rangedPrefabs[index];
-    }
-
     private void ClearEnemies()
     {
         foreach (Unit enemy in enemyUnits)
@@ -280,18 +279,27 @@ public class EnemySetup : MonoBehaviour
             if (enemy == null)
                 continue;
 
-            if (enemy.currentCell != null)
-            {
-                enemy.currentCell.RemoveUnit();
-            }
+            // ========================================
+            // TRẢ ENEMY VỀ POOL
+            // ========================================
 
-            Destroy(enemy.gameObject);
+            if (unitPool != null)
+            {
+                unitPool.ReturnUnit(enemy);
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "EnemySetup → UnitPool is NULL. " +
+                    "Cannot return Enemy."
+                );
+            }
         }
 
         enemyUnits.Clear();
 
         Debug.Log(
-            "EnemySetup → Old enemies cleared."
+            "EnemySetup → Old enemies returned to Pool."
         );
     }
 

@@ -64,21 +64,33 @@ public class UnitDrag : MonoBehaviour
             Mouse.current.position.ReadValue()
         );
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, gridCellLayer))
+        if (Physics.Raycast(
+            ray,
+            out RaycastHit hit,
+            100f,
+            gridCellLayer))
         {
-            GridCell targetCell = hit.collider.GetComponent<GridCell>();
+            GridCell targetCell =
+                hit.collider.GetComponent<GridCell>();
 
             if (targetCell != null)
             {
-                // Ô trống
+                // ========================================
+                // Ô TRỐNG
+                // ========================================
+
                 if (!targetCell.IsOccupied)
                 {
                     unit.SetCell(targetCell);
                     return;
                 }
 
-                // Ô có Unit → thử Merge
-                Unit targetUnit = targetCell.currentUnit;
+                // ========================================
+                // Ô CÓ UNIT → THỬ MERGE
+                // ========================================
+
+                Unit targetUnit =
+                    targetCell.currentUnit;
 
                 if (CanMerge(targetUnit))
                 {
@@ -88,7 +100,10 @@ public class UnitDrag : MonoBehaviour
             }
         }
 
-        // Không hợp lệ → quay lại ô cũ
+        // ========================================
+        // KHÔNG HỢP LỆ → QUAY VỀ Ô CŨ
+        // ========================================
+
         unit.SetCell(originalCell);
     }
 
@@ -111,28 +126,98 @@ public class UnitDrag : MonoBehaviour
 
     private void Merge(Unit targetUnit)
     {
-        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        UnitPool unitPool =
+        FindAnyObjectByType<UnitPool>();
 
-        Unit nextLevelPrefab = gameManager.GetNextLevelPrefab(unit);
-
-        if (nextLevelPrefab == null)
+        if (unitPool == null)
         {
-            Debug.Log("Already at max level!");
+            Debug.LogError(
+                "UnitDrag → UnitPool not found!"
+            );
 
             unit.SetCell(originalCell);
             return;
         }
 
-        GridCell mergeCell = targetUnit.currentCell;
+        // ========================================
+        // LƯU THÔNG TIN TRƯỚC KHI RETURN
+        // ========================================
 
-        targetUnit.currentCell.RemoveUnit();
-        unit.currentCell.RemoveUnit();
+        UnitType unitType =
+            unit.unitType;
 
-        Destroy(targetUnit.gameObject);
-        Destroy(unit.gameObject);
+        int currentLevel =
+            unit.level;
 
-        Unit newUnit = Instantiate(nextLevelPrefab);
+        int nextLevel =
+            currentLevel + 1;
+
+        GridCell mergeCell =
+            targetUnit.currentCell;
+
+        if (mergeCell == null)
+        {
+            Debug.LogError(
+                "UnitDrag → Merge cell is NULL!"
+            );
+
+            unit.SetCell(originalCell);
+            return;
+        }
+
+        // ========================================
+        // TRẢ 2 UNIT CŨ VỀ POOL
+        // ========================================
+
+        unitPool.ReturnUnit(targetUnit);
+        unitPool.ReturnUnit(unit);
+
+        Debug.Log(
+            "MERGE → " +
+            unitType +
+            " Lv" +
+            currentLevel +
+            " + " +
+            unitType +
+            " Lv" +
+            currentLevel
+        );
+
+        // ========================================
+        // LẤY UNIT LEVEL MỚI
+        // ========================================
+
+        Unit newUnit =
+            unitPool.GetUnit(
+                unitType,
+                nextLevel
+            );
+
+        if (newUnit == null)
+        {
+            Debug.LogError(
+                "UnitDrag → Cannot get next level Unit from Pool! " +
+                unitType +
+                " Lv" +
+                nextLevel
+            );
+
+            return;
+        }
+
+        // ========================================
+        // ĐẶT VÀO Ô MERGE
+        // ========================================
 
         newUnit.SetCell(mergeCell);
+
+        Debug.Log(
+            "MERGE SUCCESS → " +
+            newUnit.unitType +
+            " Lv" +
+            newUnit.level +
+            " | Cell " +
+            mergeCell.name
+        );
     }
 }

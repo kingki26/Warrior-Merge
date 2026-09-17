@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,11 +15,185 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Unit[] meleePrefabs;
     [SerializeField] private Unit[] rangedPrefabs;
-
+    //
     [SerializeField] private EnemySetup enemySetup;
     [SerializeField] private VictoryUI victoryUI;
+    [SerializeField] private DefeatUI defeatUI;
+    [SerializeField] private UnitPool unitPool;
+
+    [System.Serializable]
+    private class PlayerUnitSnapshot
+    {
+        public UnitType unitType;
+        public int level;
+        public string cellName;
+    }
+
+    private List<PlayerUnitSnapshot> playerSnapshot = new List<PlayerUnitSnapshot>();
 
     private bool isFighting;
+
+    private void SavePlayerSnapshot()
+    {
+        playerSnapshot.Clear();
+
+        foreach (GridCell cell in playerCells)
+        {
+            if (cell == null)
+                continue;
+
+            if (!cell.IsOccupied)
+                continue;
+
+            Unit unit = cell.currentUnit;
+
+            if (unit == null)
+                continue;
+
+            PlayerUnitSnapshot snapshot =
+                new PlayerUnitSnapshot();
+
+            snapshot.unitType = unit.unitType;
+            snapshot.level = unit.level;
+            snapshot.cellName = cell.name;
+
+            playerSnapshot.Add(snapshot);
+
+            Debug.Log(
+                "Snapshot → " +
+                snapshot.unitType +
+                " Lv" +
+                snapshot.level +
+                " | Cell " +
+                snapshot.cellName
+            );
+        }
+
+        Debug.Log(
+            "GameManager → Player snapshot saved: " +
+            playerSnapshot.Count +
+            " units."
+        );
+    }
+
+    public void RestorePlayerSnapshot()
+    {
+        Debug.Log(
+            "GameManager → Restoring Player snapshot..."
+        );
+
+        if (unitPool == null)
+        {
+            Debug.LogError(
+                "GameManager → UnitPool is NULL!"
+            );
+
+            return;
+        }
+
+        // ========================================
+        // CLEAR PLAYER UNITS HIỆN TẠI
+        // ========================================
+
+        foreach (GridCell cell in playerCells)
+        {
+            if (cell == null)
+                continue;
+
+            if (!cell.IsOccupied)
+                continue;
+
+            Unit unit =
+                cell.currentUnit;
+
+            if (unit != null)
+            {
+                unitPool.ReturnUnit(unit);
+            }
+        }
+
+        // ========================================
+        // RESTORE SNAPSHOT
+        // ========================================
+
+        foreach (
+            PlayerUnitSnapshot snapshot
+            in playerSnapshot
+        )
+        {
+            GridCell targetCell = null;
+
+            // Tìm đúng Cell theo tên
+            foreach (GridCell cell in playerCells)
+            {
+                if (cell == null)
+                    continue;
+
+                if (cell.name == snapshot.cellName)
+                {
+                    targetCell = cell;
+                    break;
+                }
+            }
+
+            if (targetCell == null)
+            {
+                Debug.LogError(
+                    "GameManager → Cannot find Player Cell: " +
+                    snapshot.cellName
+                );
+
+                continue;
+            }
+
+            if (targetCell.IsOccupied)
+            {
+                Debug.LogError(
+                    "GameManager → Cell already occupied: " +
+                    snapshot.cellName
+                );
+
+                continue;
+            }
+
+            // Lấy Unit đúng Type + Level từ Pool
+            Unit unit =
+                unitPool.GetUnit(
+                    snapshot.unitType,
+                    snapshot.level
+                );
+
+            if (unit == null)
+            {
+                Debug.LogError(
+                    "GameManager → Cannot restore Unit → " +
+                    snapshot.unitType +
+                    " Lv" +
+                    snapshot.level
+                );
+
+                continue;
+            }
+
+            unit.SetCell(targetCell);
+
+            Debug.Log(
+                "RESTORE PLAYER → " +
+                snapshot.unitType +
+                " Lv" +
+                snapshot.level +
+                " | Cell " +
+                snapshot.cellName
+            );
+        }
+
+        isFighting = false;
+
+        Debug.Log(
+            "GameManager → Player snapshot restored."
+        );
+    }
+
 
     public void SpawnMelee()
     {
@@ -57,6 +232,8 @@ public class GameManager : MonoBehaviour
         // START FIGHT
         // ========================================
 
+        SavePlayerSnapshot();
+
         isFighting = true;
 
         enemySetup.StartFight();
@@ -84,13 +261,36 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        if (unitPool == null)
+        {
+            Debug.LogError("GameManager → UnitPool is NULL!");
+            return;
+        }
+
         foreach (GridCell cell in playerCells)
         {
             if (!cell.IsOccupied)
             {
-                Debug.Log("Found empty cell: " + cell.name);
+                Debug.Log(
+                    "Found empty cell: " +
+                    cell.name
+                );
 
-                Unit newUnit = Instantiate(prefab);
+                Unit newUnit =
+                    unitPool.GetUnit(
+                        prefab.unitType,
+                        prefab.level
+                    );
+
+                if (newUnit == null)
+                {
+                    Debug.LogError(
+                        "GameManager → Cannot get Unit from Pool!"
+                    );
+
+                    return;
+                }
+
                 newUnit.SetCell(cell);
 
                 return;
@@ -231,7 +431,10 @@ public class GameManager : MonoBehaviour
 
         isFighting = false;
 
-        // TODO: Show Defeat UI
+        if (defeatUI != null)
+        {
+            defeatUI.ShowDefeat();
+        }
     }
     public void ResetPlayerForNextLevel()
     {

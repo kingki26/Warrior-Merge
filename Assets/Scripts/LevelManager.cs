@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private EnemySetup enemySetup;
     [SerializeField] private GameManager gameManager;
     [SerializeField] private VictoryUI victoryUI;
+    [SerializeField] private DefeatUI defeatUI;
 
     public int CurrentLevel
     {
@@ -31,12 +32,17 @@ public class LevelManager : MonoBehaviour
 
         if (gameManager != null)
         {
-            gameManager.ResetPlayerForNextLevel();
+            gameManager.RestorePlayerSnapshot();
         }
 
         if (victoryUI != null)
         {
             victoryUI.HideVictory();
+        }
+
+        if (defeatUI != null)
+        {
+            defeatUI.HideDefeat();
         }
 
         LoadCurrentLevel();
@@ -51,12 +57,17 @@ public class LevelManager : MonoBehaviour
 
         if (gameManager != null)
         {
-            gameManager.ResetPlayerForNextLevel();
+            gameManager.RestorePlayerSnapshot();
         }
 
         if (victoryUI != null)
         {
             victoryUI.HideVictory();
+        }
+
+        if (defeatUI != null)
+        {
+            defeatUI.HideDefeat();
         }
 
         LoadCurrentLevel();

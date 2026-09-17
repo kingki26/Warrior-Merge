@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class UnitHealth : MonoBehaviour
 {
@@ -11,20 +11,41 @@ public class UnitHealth : MonoBehaviour
 
     private void Awake()
     {
-        currentHealth = maxHealth;
         animator = GetComponent<Animator>();
+        ResetHealth();
     }
+
+    // ========================================
+    // RESET
+    // ========================================
+
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;
+        isDead = false;
+    }
+
+    // ========================================
+    // DAMAGE
+    // ========================================
 
     public void TakeDamage(int damage)
     {
-        Debug.Log(gameObject.name + " RECEIVED DAMAGE: " + damage);
+        Debug.Log(
+            gameObject.name +
+            " RECEIVED DAMAGE: " +
+            damage
+        );
+
         if (isDead)
             return;
 
         currentHealth -= damage;
 
         Debug.Log(
-            gameObject.name + " HP: " + currentHealth
+            gameObject.name +
+            " HP: " +
+            currentHealth
         );
 
         if (currentHealth <= 0)
@@ -33,15 +54,24 @@ public class UnitHealth : MonoBehaviour
         }
     }
 
+    // ========================================
+    // DIE
+    // ========================================
+
     private void Die()
     {
         isDead = true;
 
-        Debug.Log(gameObject.name + " died!");
+        Debug.Log(
+            gameObject.name +
+            " died!"
+        );
 
-        Unit unit = GetComponent<Unit>();
+        Unit unit =
+            GetComponent<Unit>();
 
-        if (unit != null && unit.currentCell != null)
+        if (unit != null &&
+            unit.currentCell != null)
         {
             unit.currentCell.RemoveUnit();
 
@@ -50,11 +80,8 @@ public class UnitHealth : MonoBehaviour
 
             if (gameManager != null)
             {
-                if (unit.GetComponent<UnitHealth>() != null)
-                {
-                    gameManager.CheckVictory();
-                    gameManager.CheckDefeat();
-                }
+                gameManager.CheckVictory();
+                gameManager.CheckDefeat();
             }
         }
 
@@ -63,8 +90,46 @@ public class UnitHealth : MonoBehaviour
             animator.SetTrigger("Die");
         }
 
-        Destroy(gameObject, 2f);
+        Invoke(
+            nameof(ReturnToPool),
+            2f
+        );
     }
+
+    // ========================================
+    // RETURN POOL
+    // ========================================
+
+    private void ReturnToPool()
+    {
+        Unit unit =
+            GetComponent<Unit>();
+
+        if (unit == null)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
+        UnitPool unitPool =
+            FindAnyObjectByType<UnitPool>();
+
+        if (unitPool == null)
+        {
+            Debug.LogError(
+                "UnitHealth → UnitPool not found!"
+            );
+
+            gameObject.SetActive(false);
+            return;
+        }
+
+        unitPool.ReturnUnit(unit);
+    }
+
+    // ========================================
+    // PUBLIC
+    // ========================================
 
     public bool IsDead()
     {
