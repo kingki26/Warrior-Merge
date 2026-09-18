@@ -372,7 +372,13 @@
     },
     {
       "level": 15,
-      "enemies": []
+      "enemies": [
+    {
+          "type": "Boss",
+          "bossLevel": "Boss 1",
+          "cell": "B3"
+        }
+      ]
     },
     {
       "level": 16,
@@ -926,7 +932,13 @@
     },
     {
       "level": 30,
-      "enemies": []
+      "enemies": [
+    {
+          "type": "Boss",
+          "bossLevel": "Boss 2",
+          "cell": "B3"
+        }
+      ]
     },
     {
       "level": 31,

@@ -84,6 +84,12 @@ public class RangedCombat : MonoBehaviour
         if (target == null)
         {
             SetIdle();
+
+            if (gameManager != null)
+            {
+                gameManager.CheckVictory();
+            }
+
             return;
         }
 
@@ -119,7 +125,16 @@ public class RangedCombat : MonoBehaviour
             return;
 
         if (unit.currentCell == null)
+        {
+            Debug.LogError(
+        unit.name +
+        " → currentCell is NULL! Cannot find target."
+            );
+
             return;
+
+        }
+            
 
         GridCell[] targetCells;
 
@@ -137,6 +152,14 @@ public class RangedCombat : MonoBehaviour
         float closestDistance =
             Mathf.Infinity;
 
+
+        Debug.Log(
+        unit.name +
+        " → Searching target from Cell: " +
+        unit.currentCell.name +
+        " | Team: " +
+        unit.currentCell.team
+        );
         target = null;
 
         foreach (GridCell cell in targetCells)
@@ -178,11 +201,11 @@ public class RangedCombat : MonoBehaviour
 
         if (target != null)
         {
-            Debug.Log(
-                unit.name +
-                " targets " +
-                target.name
-            );
+            //Debug.Log(
+            //    unit.name +
+            //    " targets " +
+            //    target.name
+            //);
         }
     }
 
@@ -193,6 +216,14 @@ public class RangedCombat : MonoBehaviour
     private bool IsTargetDead()
     {
         if (target == null)
+            return true;
+
+        // Target không còn nằm trên Cell
+        if (target.currentCell == null)
+            return true;
+
+        // Target đã bị disable / trả về Pool
+        if (!target.gameObject.activeInHierarchy)
             return true;
 
         UnitHealth targetHealth =
@@ -242,10 +273,10 @@ public class RangedCombat : MonoBehaviour
 
         isAttacking = true;
 
-        Debug.Log(
-            unit.name +
-            " ATTACK!"
-        );
+        //Debug.Log(
+        //    unit.name +
+        //    " ATTACK!"
+        //);
 
         if (animator != null)
         {
@@ -414,11 +445,6 @@ public class RangedCombat : MonoBehaviour
         if (animator != null)
         {
             animator.ResetTrigger("Attack");
-
-            animator.SetBool(
-                "IsMoving",
-                false
-            );
 
             animator.Play(
                 "Idle",

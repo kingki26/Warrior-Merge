@@ -6,6 +6,7 @@ public class EnemyData
 {
     public string type;
     public int level;
+    public string bossLevel;
     public string cell;
 }
 

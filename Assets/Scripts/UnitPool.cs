@@ -3,30 +3,77 @@ using UnityEngine;
 
 public class UnitPool : MonoBehaviour
 {
-    [Header("Melee Prefabs")]
-    [SerializeField] private Unit[] meleePrefabs;
+    [Header("Player - Melee Prefabs")]
+    [SerializeField] private Unit[] playerMeleePrefabs;
 
-    [Header("Ranged Prefabs")]
-    [SerializeField] private Unit[] rangedPrefabs;
+    [Header("Player - Ranged Prefabs")]
+    [SerializeField] private Unit[] playerRangedPrefabs;
+
+    [Header("Enemy - Melee Prefabs")]
+    [SerializeField] private Unit[] enemyMeleePrefabs;
+
+    [Header("Enemy - Ranged Prefabs")]
+    [SerializeField] private Unit[] enemyRangedPrefabs;
 
     [Header("Pool Settings")]
     [SerializeField] private int initialSizePerLevel = 15;
 
-    private Dictionary<string, Queue<Unit>> pools =
+    private Dictionary<string, Queue<Unit>> playerPools =
+        new Dictionary<string, Queue<Unit>>();
+
+    private Dictionary<string, Queue<Unit>> enemyPools =
         new Dictionary<string, Queue<Unit>>();
 
     private void Awake()
     {
-        CreatePools();
+        CreatePlayerPools();
+        CreateEnemyPools();
     }
 
-    private void CreatePools()
+    // =========================================================
+    // CREATE PLAYER POOLS
+    // =========================================================
+
+    private void CreatePlayerPools()
     {
-        CreatePool(UnitType.Melee, meleePrefabs);
-        CreatePool(UnitType.Ranged, rangedPrefabs);
+        CreatePool(
+            playerPools,
+            UnitType.Melee,
+            playerMeleePrefabs
+        );
+
+        CreatePool(
+            playerPools,
+            UnitType.Ranged,
+            playerRangedPrefabs
+        );
     }
+
+    // =========================================================
+    // CREATE ENEMY POOLS
+    // =========================================================
+
+    private void CreateEnemyPools()
+    {
+        CreatePool(
+            enemyPools,
+            UnitType.Melee,
+            enemyMeleePrefabs
+        );
+
+        CreatePool(
+            enemyPools,
+            UnitType.Ranged,
+            enemyRangedPrefabs
+        );
+    }
+
+    // =========================================================
+    // CREATE POOL
+    // =========================================================
 
     private void CreatePool(
+        Dictionary<string, Queue<Unit>> targetPools,
         UnitType unitType,
         Unit[] prefabs
     )
@@ -39,26 +86,24 @@ public class UnitPool : MonoBehaviour
             Unit prefab = prefabs[i];
 
             if (prefab == null)
-            {
-                Debug.LogWarning(
-                    "UnitPool → Missing prefab at index: " +
-                    i +
-                    " | Type: " +
-                    unitType
-                );
-
                 continue;
-            }
 
             int level = i + 1;
 
             string key =
-                GetPoolKey(unitType, level);
+                GetPoolKey(
+                    unitType,
+                    level
+                );
 
             Queue<Unit> unitQueue =
                 new Queue<Unit>();
 
-            for (int j = 0; j < initialSizePerLevel; j++)
+            for (
+                int j = 0;
+                j < initialSizePerLevel;
+                j++
+            )
             {
                 Unit unit =
                     Instantiate(
@@ -71,36 +116,67 @@ public class UnitPool : MonoBehaviour
                 unitQueue.Enqueue(unit);
             }
 
-            pools.Add(
-                key,
-                unitQueue
-            );
-
-            Debug.Log(
-                "UnitPool → Created " +
-                key +
-                " | Size: " +
-                initialSizePerLevel
-            );
+            targetPools[key] = unitQueue;
         }
     }
 
-    // ========================================
-    // GET UNIT
-    // ========================================
+    // =========================================================
+    // GET PLAYER UNIT
+    // =========================================================
 
-    public Unit GetUnit(
+    public Unit GetPlayerUnit(
         UnitType unitType,
         int level
     )
     {
-        string key =
-            GetPoolKey(unitType, level);
+        return GetUnitFromPool(
+            playerPools,
+            unitType,
+            level,
+            "Player"
+        );
+    }
 
-        if (!pools.ContainsKey(key))
+    // =========================================================
+    // GET ENEMY UNIT
+    // =========================================================
+
+    public Unit GetEnemyUnit(
+        UnitType unitType,
+        int level
+    )
+    {
+        return GetUnitFromPool(
+            enemyPools,
+            unitType,
+            level,
+            "Enemy"
+        );
+    }
+
+    // =========================================================
+    // GET UNIT FROM POOL
+    // =========================================================
+
+    private Unit GetUnitFromPool(
+        Dictionary<string, Queue<Unit>> targetPools,
+        UnitType unitType,
+        int level,
+        string owner
+    )
+    {
+        string key =
+            GetPoolKey(
+                unitType,
+                level
+            );
+
+        if (!targetPools.ContainsKey(key))
         {
             Debug.LogWarning(
-                "UnitPool → Pool not found: " +
+                "UnitPool → " +
+                owner +
+                " pool not found: " +
                 key
             );
 
@@ -108,60 +184,120 @@ public class UnitPool : MonoBehaviour
         }
 
         Queue<Unit> pool =
-            pools[key];
+            targetPools[key];
 
-        if (pool.Count == 0)
+        // -----------------------------------------------------
+        // POOL HAS UNIT
+        // -----------------------------------------------------
+
+        if (pool.Count > 0)
         {
-            Debug.Log(
-                "UnitPool → Pool empty → " +
-                key +
-                " → Creating new Unit."
-            );
+            Unit unit =
+                pool.Dequeue();
 
-            Unit prefab =
-                GetPrefab(
-                    unitType,
-                    level
-                );
-
-            if (prefab == null)
+            if (unit == null)
             {
-                Debug.LogError(
-                    "UnitPool → Cannot create Unit. " +
-                    "Prefab not found: " +
+                Debug.LogWarning(
+                    "UnitPool → " +
+                    owner +
+                    " pool contained NULL Unit → " +
                     key
                 );
 
-                return null;
+                return GetUnitFromPool(
+                    targetPools,
+                    unitType,
+                    level,
+                    owner
+                );
             }
 
-            Unit newUnit =
-                Instantiate(
-                    prefab,
-                    transform
-                );
+            unit.ResetForReuse();
 
-            newUnit.ResetForReuse();
+            unit.gameObject.SetActive(true);
 
-            newUnit.gameObject.SetActive(true);
-
-            return newUnit;
+            return unit;
         }
 
-        Unit unit =
-    pool.Dequeue();
+        // -----------------------------------------------------
+        // POOL EMPTY → CREATE NEW
+        // -----------------------------------------------------
 
-        unit.gameObject.SetActive(true);
-        unit.ResetForReuse();
+        Debug.Log(
+            "UnitPool → " +
+            owner +
+            " pool empty → " +
+            key +
+            " → Creating new Unit."
+        );
 
-        return unit;
+        Unit prefab =
+            GetPrefab(
+                owner,
+                unitType,
+                level
+            );
+
+        if (prefab == null)
+        {
+            Debug.LogError(
+                "UnitPool → Cannot create " +
+                owner +
+                " Unit → " +
+                key
+            );
+
+            return null;
+        }
+
+        Unit newUnit =
+            Instantiate(
+                prefab,
+                transform
+            );
+
+        newUnit.ResetForReuse();
+
+        newUnit.gameObject.SetActive(true);
+
+        return newUnit;
     }
 
-    // ========================================
-    // RETURN UNIT
-    // ========================================
+    // =========================================================
+    // RETURN PLAYER UNIT
+    // =========================================================
 
-    public void ReturnUnit(Unit unit)
+    public void ReturnPlayerUnit(Unit unit)
+    {
+        ReturnUnitToPool(
+            playerPools,
+            unit,
+            "Player"
+        );
+    }
+
+    // =========================================================
+    // RETURN ENEMY UNIT
+    // =========================================================
+
+    public void ReturnEnemyUnit(Unit unit)
+    {
+        ReturnUnitToPool(
+            enemyPools,
+            unit,
+            "Enemy"
+        );
+    }
+
+    // =========================================================
+    // RETURN UNIT TO POOL
+    // =========================================================
+
+    private void ReturnUnitToPool(
+        Dictionary<string, Queue<Unit>> targetPools,
+        Unit unit,
+        string owner
+    )
     {
         if (unit == null)
             return;
@@ -172,11 +308,12 @@ public class UnitPool : MonoBehaviour
                 unit.level
             );
 
-        if (!pools.ContainsKey(key))
+        if (!targetPools.ContainsKey(key))
         {
             Debug.LogWarning(
-                "UnitPool → Cannot return Unit. " +
-                "Pool not found: " +
+                "UnitPool → Cannot return " +
+                owner +
+                " Unit. Pool not found: " +
                 key
             );
 
@@ -185,29 +322,64 @@ public class UnitPool : MonoBehaviour
             return;
         }
 
+        // -----------------------------------------------------
+        // REMOVE FROM CURRENT CELL
+        // -----------------------------------------------------
+
         if (unit.currentCell != null)
         {
             unit.currentCell.RemoveUnit();
             unit.currentCell = null;
         }
 
+        // -----------------------------------------------------
+        // RESET UNIT
+        // -----------------------------------------------------
+
+        unit.ResetForReuse();
+
         unit.transform.SetParent(transform);
 
         unit.gameObject.SetActive(false);
 
-        pools[key].Enqueue(unit);
+        // -----------------------------------------------------
+        // IMPORTANT:
+        // PREVENT DUPLICATE RETURN
+        // -----------------------------------------------------
+
+        if (targetPools[key].Contains(unit))
+        {
+            Debug.LogWarning(
+                "UnitPool → DUPLICATE RETURN BLOCKED → " +
+                owner +
+                " " +
+                unit.name +
+                " → " +
+                key
+            );
+
+            return;
+        }
+
+        // -----------------------------------------------------
+        // RETURN TO QUEUE
+        // -----------------------------------------------------
+
+        targetPools[key].Enqueue(unit);
 
         Debug.Log(
             "UnitPool → Returned " +
+            owner +
+            " " +
             unit.name +
             " → " +
             key
         );
     }
 
-    // ========================================
-    // HELPERS
-    // ========================================
+    // =========================================================
+    // POOL KEY
+    // =========================================================
 
     private string GetPoolKey(
         UnitType unitType,
@@ -219,7 +391,12 @@ public class UnitPool : MonoBehaviour
                level;
     }
 
+    // =========================================================
+    // GET PREFAB
+    // =========================================================
+
     private Unit GetPrefab(
+        string owner,
         UnitType unitType,
         int level
     )
@@ -229,17 +406,66 @@ public class UnitPool : MonoBehaviour
         if (index < 0)
             return null;
 
-        if (unitType == UnitType.Melee)
-        {
-            if (index >= meleePrefabs.Length)
-                return null;
+        // -----------------------------------------------------
+        // PLAYER
+        // -----------------------------------------------------
 
-            return meleePrefabs[index];
+        if (owner == "Player")
+        {
+            if (unitType == UnitType.Melee)
+            {
+                if (
+                    playerMeleePrefabs == null ||
+                    index >= playerMeleePrefabs.Length
+                )
+                {
+                    return null;
+                }
+
+                return playerMeleePrefabs[index];
+            }
+
+            if (
+                playerRangedPrefabs == null ||
+                index >= playerRangedPrefabs.Length
+            )
+            {
+                return null;
+            }
+
+            return playerRangedPrefabs[index];
         }
 
-        if (index >= rangedPrefabs.Length)
-            return null;
+        // -----------------------------------------------------
+        // ENEMY
+        // -----------------------------------------------------
 
-        return rangedPrefabs[index];
+        if (owner == "Enemy")
+        {
+            if (unitType == UnitType.Melee)
+            {
+                if (
+                    enemyMeleePrefabs == null ||
+                    index >= enemyMeleePrefabs.Length
+                )
+                {
+                    return null;
+                }
+
+                return enemyMeleePrefabs[index];
+            }
+
+            if (
+                enemyRangedPrefabs == null ||
+                index >= enemyRangedPrefabs.Length
+            )
+            {
+                return null;
+            }
+
+            return enemyRangedPrefabs[index];
+        }
+
+        return null;
     }
 }

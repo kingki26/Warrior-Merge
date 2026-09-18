@@ -386,13 +386,13 @@ GameObject:
   m_Component:
   - component: {fileID: 851539242951582717}
   - component: {fileID: 3603079716400186020}
-  - component: {fileID: -7074345162190911473}
   - component: {fileID: 6939939750729034737}
   - component: {fileID: -2435403981523264614}
   - component: {fileID: 1734075837492779741}
   - component: {fileID: 7741487722837301523}
+  - component: {fileID: 457813060777637274}
   m_Layer: 0
-  m_Name: Mlv4
+  m_Name: Boss2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -408,7 +408,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.5693393, y: 0.8700002, z: -10.298998}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5046531669452422231}
@@ -437,24 +437,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-7074345162190911473
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2486860949571786941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb32ddb05b166a7429eaa5bd8ab5c477, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Unit
-  currentCell: {fileID: 0}
-  unitType: 0
-  level: 4
-  maxHealth: 600
-  damage: 80
-  attackCooldown: 0.8
 --- !u!65 &6939939750729034737
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -503,10 +485,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10fc1ba4c204e15488a23a0e8e3522fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  moveSpeed: 2.4
-  attackRange: 2.5
+  moveSpeed: 4
+  attackRange: 4
   attackCooldown: 1
-  damage: 80
+  damage: 150
 --- !u!114 &7741487722837301523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,7 +501,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
-  maxHealth: 600
+  maxHealth: 4000
+--- !u!114 &457813060777637274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2486860949571786941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86bb9491708642646a381ea0604ff5c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossUnit
+  currentCell: {fileID: 0}
+  unitType: 0
+  level: 1
+  maxHealth: 4000
+  damage: 150
+  attackCooldown: 0.8
+  bossLevel: Boss 2
 --- !u!1 &2639810824512530539
 GameObject:
   m_ObjectHideFlags: 0

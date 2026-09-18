@@ -451,7 +451,7 @@ MonoBehaviour:
   currentCell: {fileID: 0}
   unitType: 1
   level: 3
-  maxHealth: 150
+  maxHealth: 200
   damage: 40
   attackCooldown: 0.8
 --- !u!65 &7286378469136836818
@@ -502,7 +502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
-  maxHealth: 150
+  maxHealth: 200
 --- !u!114 &4725090311309820872
 MonoBehaviour:
   m_ObjectHideFlags: 0

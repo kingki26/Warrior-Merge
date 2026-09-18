@@ -18,9 +18,9 @@ public class LevelDataReader : MonoBehaviour
 
         if (jsonFile == null)
         {
-            Debug.LogError(
-                "Không tìm thấy JSON: " + fileName
-            );
+            //Debug.LogError(
+            //    "Không tìm thấy JSON: " + fileName
+            //);
 
             return;
         }
@@ -33,17 +33,17 @@ public class LevelDataReader : MonoBehaviour
         if (levelDatabase == null ||
             levelDatabase.levels == null)
         {
-            Debug.LogError(
-                "JSON không đọc được hoặc không có levels!"
-            );
+            //Debug.LogError(
+            //    "JSON không đọc được hoặc không có levels!"
+            //);
 
             return;
         }
 
-        Debug.Log(
-            "Đã load JSON thành công! Tổng số level: " +
-            levelDatabase.levels.Count
-        );
+        //Debug.Log(
+        //    "Đã load JSON thành công! Tổng số level: " +
+        //    levelDatabase.levels.Count
+        //);
 
         PrintLevel(1);
     }
@@ -61,30 +61,30 @@ public class LevelDataReader : MonoBehaviour
             }
         }
 
-        if (levelData == null)
-        {
-            Debug.LogError(
-                "Không tìm thấy Level " + levelNumber
-            );
+        //if (levelData == null)
+        //{
+        //    Debug.LogError(
+        //        "Không tìm thấy Level " + levelNumber
+        //    );
 
-            return;
-        }
+        //    return;
+        //}
 
-        Debug.Log(
-            "===== LEVEL " +
-            levelData.level +
-            " ====="
-        );
+        //Debug.Log(
+        //    "===== LEVEL " +
+        //    levelData.level +
+        //    " ====="
+        //);
 
-        foreach (EnemyData enemy in levelData.enemies)
-        {
-            Debug.Log(
-                enemy.type +
-                " Lv" +
-                enemy.level +
-                " → Cell: " +
-                enemy.cell
-            );
-        }
+        //foreach (EnemyData enemy in levelData.enemies)
+        //{
+        //    Debug.Log(
+        //        enemy.type +
+        //        " Lv" +
+        //        enemy.level +
+        //        " → Cell: " +
+        //        enemy.cell
+        //    );
+        //}
     }
 }

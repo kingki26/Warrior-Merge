@@ -7,6 +7,7 @@ public class UnitDrag : MonoBehaviour
 
     private Unit unit;
     private UnitCombat unitCombat;
+    private RangedCombat rangedCombat;
     private GridCell originalCell;
 
     private bool isDragging;
@@ -16,21 +17,49 @@ public class UnitDrag : MonoBehaviour
     {
         unit = GetComponent<Unit>();
         unitCombat = GetComponent<UnitCombat>();
+        rangedCombat = GetComponent<RangedCombat>();
     }
 
     private void OnMouseDown()
     {
+
+        Debug.Log(
+        "DRAG CHECK → " +
+        unit.name +
+        " | Cell: " +
+        unit.currentCell.name +
+        " | Melee Fighting: " +
+        (unitCombat != null && unitCombat.IsFighting()) +
+        " | Ranged Fighting: " +
+        (rangedCombat != null && rangedCombat.IsFighting())
+        );
+
         if (unit.currentCell == null)
             return;
 
-        // Đang combat thì không cho kéo
-        if (unitCombat != null && unitCombat.IsFighting())
+        // ========================================
+        // ĐANG COMBAT → KHÔNG CHO KÉO
+        // ========================================
+
+        if (unitCombat != null &&
+            unitCombat.IsFighting())
+        {
             return;
+        }
+
+        if (rangedCombat != null &&
+            rangedCombat.IsFighting())
+        {
+            return;
+        }
 
         isDragging = true;
-        originalCell = unit.currentCell;
 
-        dragHeight = transform.position.y;
+        originalCell =
+            unit.currentCell;
+
+        dragHeight =
+            transform.position.y;
     }
 
     private void OnMouseDrag()
@@ -38,18 +67,28 @@ public class UnitDrag : MonoBehaviour
         if (!isDragging)
             return;
 
-        Ray ray = Camera.main.ScreenPointToRay(
-            Mouse.current.position.ReadValue()
-        );
+        Ray ray =
+            Camera.main.ScreenPointToRay(
+                Mouse.current.position.ReadValue()
+            );
 
-        Plane boardPlane = new Plane(
-            Vector3.up,
-            new Vector3(0, dragHeight, 0)
-        );
+        Plane boardPlane =
+            new Plane(
+                Vector3.up,
+                new Vector3(
+                    0,
+                    dragHeight,
+                    0
+                )
+            );
 
-        if (boardPlane.Raycast(ray, out float distance))
+        if (boardPlane.Raycast(
+            ray,
+            out float distance
+        ))
         {
-            transform.position = ray.GetPoint(distance);
+            transform.position =
+                ray.GetPoint(distance);
         }
     }
 
@@ -60,15 +99,17 @@ public class UnitDrag : MonoBehaviour
 
         isDragging = false;
 
-        Ray ray = Camera.main.ScreenPointToRay(
-            Mouse.current.position.ReadValue()
-        );
+        Ray ray =
+            Camera.main.ScreenPointToRay(
+                Mouse.current.position.ReadValue()
+            );
 
         if (Physics.Raycast(
             ray,
             out RaycastHit hit,
             100f,
-            gridCellLayer))
+            gridCellLayer
+        ))
         {
             GridCell targetCell =
                 hit.collider.GetComponent<GridCell>();
@@ -107,6 +148,10 @@ public class UnitDrag : MonoBehaviour
         unit.SetCell(originalCell);
     }
 
+    // ========================================
+    // CAN MERGE
+    // ========================================
+
     private bool CanMerge(Unit targetUnit)
     {
         if (targetUnit == null)
@@ -124,10 +169,14 @@ public class UnitDrag : MonoBehaviour
         return true;
     }
 
+    // ========================================
+    // MERGE
+    // ========================================
+
     private void Merge(Unit targetUnit)
     {
         UnitPool unitPool =
-        FindAnyObjectByType<UnitPool>();
+            FindAnyObjectByType<UnitPool>();
 
         if (unitPool == null)
         {
@@ -140,7 +189,7 @@ public class UnitDrag : MonoBehaviour
         }
 
         // ========================================
-        // LƯU THÔNG TIN TRƯỚC KHI RETURN
+        // LƯU THÔNG TIN
         // ========================================
 
         UnitType unitType =
@@ -166,11 +215,56 @@ public class UnitDrag : MonoBehaviour
         }
 
         // ========================================
-        // TRẢ 2 UNIT CŨ VỀ POOL
+        // KIỂM TRA LEVEL
         // ========================================
 
-        unitPool.ReturnUnit(targetUnit);
-        unitPool.ReturnUnit(unit);
+        if (nextLevel > 5)
+        {
+            Debug.Log(
+                "UnitDrag → Cannot merge beyond Lv5."
+            );
+
+            unit.SetCell(originalCell);
+            return;
+        }
+
+        // ========================================
+        // LẤY UNIT LEVEL MỚI TRƯỚC
+        // ========================================
+        // Quan trọng:
+        // Không return 2 unit cũ trước khi biết
+        // Unit level mới có tồn tại trong Pool.
+
+        Unit newUnit =
+            unitPool.GetPlayerUnit(
+                unitType,
+                nextLevel
+            );
+
+        if (newUnit == null)
+        {
+            Debug.LogError(
+                "UnitDrag → Cannot get next level Player Unit from Pool! " +
+                unitType +
+                " Lv" +
+                nextLevel
+            );
+
+            unit.SetCell(originalCell);
+            return;
+        }
+
+        // ========================================
+        // TRẢ 2 UNIT CŨ VỀ PLAYER POOL
+        // ========================================
+
+        unitPool.ReturnPlayerUnit(
+            targetUnit
+        );
+
+        unitPool.ReturnPlayerUnit(
+            unit
+        );
 
         Debug.Log(
             "MERGE → " +
@@ -184,32 +278,12 @@ public class UnitDrag : MonoBehaviour
         );
 
         // ========================================
-        // LẤY UNIT LEVEL MỚI
+        // ĐẶT UNIT MỚI VÀO Ô MERGE
         // ========================================
 
-        Unit newUnit =
-            unitPool.GetUnit(
-                unitType,
-                nextLevel
-            );
-
-        if (newUnit == null)
-        {
-            Debug.LogError(
-                "UnitDrag → Cannot get next level Unit from Pool! " +
-                unitType +
-                " Lv" +
-                nextLevel
-            );
-
-            return;
-        }
-
-        // ========================================
-        // ĐẶT VÀO Ô MERGE
-        // ========================================
-
-        newUnit.SetCell(mergeCell);
+        newUnit.SetCell(
+            mergeCell
+        );
 
         Debug.Log(
             "MERGE SUCCESS → " +

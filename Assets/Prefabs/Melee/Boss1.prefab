@@ -396,13 +396,12 @@ GameObject:
   m_Component:
   - component: {fileID: 8806990080754136438}
   - component: {fileID: 3693611424496220356}
-  - component: {fileID: -2388567307235824033}
   - component: {fileID: 939716333228234350}
-  - component: {fileID: -264398416378299441}
   - component: {fileID: 9014836904026227364}
   - component: {fileID: -2368607000639046941}
+  - component: {fileID: -2223021904568495586}
   m_Layer: 0
-  m_Name: Mlv3
+  m_Name: Boss1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -417,8 +416,8 @@ Transform:
   m_GameObject: {fileID: 5295021528191054666}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.3886476, y: 0.87000036, z: -10.057271}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 4.4337, y: 0.49623, z: -10.138}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1126246921125257075}
@@ -447,24 +446,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-2388567307235824033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5295021528191054666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb32ddb05b166a7429eaa5bd8ab5c477, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Unit
-  currentCell: {fileID: 0}
-  unitType: 0
-  level: 3
-  maxHealth: 300
-  damage: 30
-  attackCooldown: 0.8
 --- !u!65 &939716333228234350
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -486,21 +467,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.9369197, y: 1.9808323, z: 1}
   m_Center: {x: -0.1382873, y: 0.8742975, z: 0}
---- !u!114 &-264398416378299441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5295021528191054666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 245cedd98b84a95489e1928ca18b2e61, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UnitDrag
-  gridCellLayer:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!114 &9014836904026227364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,8 +479,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10fc1ba4c204e15488a23a0e8e3522fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  moveSpeed: 2.2
-  attackRange: 2.2
+  moveSpeed: 5
+  attackRange: 5
   attackCooldown: 1
   damage: 30
 --- !u!114 &-2368607000639046941
@@ -529,7 +495,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
-  maxHealth: 250
+  maxHealth: 1500
+--- !u!114 &-2223021904568495586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5295021528191054666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86bb9491708642646a381ea0604ff5c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossUnit
+  currentCell: {fileID: 0}
+  unitType: 0
+  level: 3
+  maxHealth: 1500
+  damage: 80
+  attackCooldown: 0.8
+  bossLevel: Boss 1
 --- !u!1 &5445855661990008616
 GameObject:
   m_ObjectHideFlags: 0

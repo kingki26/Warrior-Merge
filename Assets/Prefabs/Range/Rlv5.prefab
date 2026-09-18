@@ -431,8 +431,8 @@ MonoBehaviour:
   currentCell: {fileID: 0}
   unitType: 1
   level: 5
-  maxHealth: 200
-  damage: 60
+  maxHealth: 500
+  damage: 120
   attackCooldown: 0.8
 --- !u!65 &7841240964500498120
 BoxCollider:
@@ -498,7 +498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17a9f1b1d592ca46a1b869bbe2e68ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitHealth
-  maxHealth: 200
+  maxHealth: 500
 --- !u!1 &7901584304189750704
 GameObject:
   m_ObjectHideFlags: 0
