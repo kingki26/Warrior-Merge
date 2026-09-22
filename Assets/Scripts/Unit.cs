@@ -60,9 +60,18 @@ public class Unit : MonoBehaviour
         UnitHealth health =
             GetComponent<UnitHealth>();
 
+
         if (health != null)
         {
             health.ResetHealth();
+        }
+
+        Canvas healthBarCanvas =
+        GetComponentInChildren<Canvas>();
+
+        if (healthBarCanvas != null)
+        {
+            healthBarCanvas.gameObject.SetActive(true);
         }
 
         UnitCombat meleeCombat =

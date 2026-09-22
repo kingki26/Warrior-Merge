@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private VictoryUI victoryUI;
     [SerializeField] private DefeatUI defeatUI;
 
+    [Header("UI")]
+    [SerializeField] private TMP_Text levelText;
+
     public int CurrentLevel
     {
         get { return currentLevel; }
@@ -18,6 +22,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        UpdateLevelUI();
+
         LoadCurrentLevel();
     }
 
@@ -45,6 +51,8 @@ public class LevelManager : MonoBehaviour
             defeatUI.HideDefeat();
         }
 
+        UpdateLevelUI();
+
         LoadCurrentLevel();
     }
 
@@ -70,7 +78,19 @@ public class LevelManager : MonoBehaviour
             defeatUI.HideDefeat();
         }
 
+        UpdateLevelUI();
+
         LoadCurrentLevel();
+    }
+
+    private void UpdateLevelUI()
+    {
+        if (levelText == null)
+            return;
+
+        levelText.text =
+            "LEVEL " +
+            currentLevel;
     }
 
     private void LoadCurrentLevel()

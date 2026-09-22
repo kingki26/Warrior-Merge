@@ -11,14 +11,45 @@ public class HealthBar : MonoBehaviour
     [SerializeField] private bool hideWhenDead = true;
 
     private UnitHealth unitHealth;
+    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
         unitHealth =
             GetComponentInParent<UnitHealth>();
 
+        canvasGroup =
+            GetComponentInParent<CanvasGroup>();
+
         Refresh();
     }
+
+    // =========================================================
+    // SETUP
+    // =========================================================
+
+    public void Setup()
+    {
+        if (unitHealth == null)
+        {
+            unitHealth =
+                GetComponentInParent<UnitHealth>();
+        }
+
+        if (canvasGroup == null)
+        {
+            canvasGroup =
+                GetComponentInParent<CanvasGroup>();
+        }
+
+        Show();
+
+        Refresh();
+    }
+
+    // =========================================================
+    // REFRESH
+    // =========================================================
 
     public void Refresh()
     {
@@ -28,11 +59,15 @@ public class HealthBar : MonoBehaviour
                 GetComponentInParent<UnitHealth>();
         }
 
+        if (fillImage == null)
+            return;
+
         if (unitHealth == null)
             return;
 
-        if (fillImage == null)
-            return;
+        // -----------------------------------------------------
+        // UPDATE FILL
+        // -----------------------------------------------------
 
         fillImage.fillAmount =
             unitHealth.GetHealthPercent();
@@ -43,10 +78,15 @@ public class HealthBar : MonoBehaviour
 
         if (hideWhenFull)
         {
-            gameObject.SetActive(
-                unitHealth.GetCurrentHealth() <
-                unitHealth.GetMaxHealth()
-            );
+            if (unitHealth.GetCurrentHealth() <
+                unitHealth.GetMaxHealth())
+            {
+                Show();
+            }
+            else
+            {
+                Hide();
+            }
         }
 
         // -----------------------------------------------------
@@ -56,7 +96,47 @@ public class HealthBar : MonoBehaviour
         if (hideWhenDead &&
             unitHealth.IsDead())
         {
-            gameObject.SetActive(false);
+            Hide();
+        }
+    }
+
+    // =========================================================
+    // SHOW
+    // =========================================================
+
+    public void Show()
+    {
+        if (canvasGroup == null)
+        {
+            canvasGroup =
+                GetComponentInParent<CanvasGroup>();
+        }
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    // =========================================================
+    // HIDE
+    // =========================================================
+
+    public void Hide()
+    {
+        if (canvasGroup == null)
+        {
+            canvasGroup =
+                GetComponentInParent<CanvasGroup>();
+        }
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
         }
     }
 }

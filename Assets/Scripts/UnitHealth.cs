@@ -77,7 +77,7 @@ public class UnitHealth : MonoBehaviour
 
         if (healthBar != null)
         {
-            healthBar.Refresh();
+            healthBar.Setup();
         }
     }
 
