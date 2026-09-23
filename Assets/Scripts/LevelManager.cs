@@ -31,11 +31,6 @@ public class LevelManager : MonoBehaviour
     {
         currentLevel++;
 
-        Debug.Log(
-            "NEXT LEVEL → " +
-            currentLevel
-        );
-
         if (gameManager != null)
         {
             gameManager.RestorePlayerSnapshot();
@@ -58,11 +53,6 @@ public class LevelManager : MonoBehaviour
 
     public void RetryLevel()
     {
-        Debug.Log(
-            "RETRY LEVEL → " +
-            currentLevel
-        );
-
         if (gameManager != null)
         {
             gameManager.RestorePlayerSnapshot();
@@ -97,10 +87,6 @@ public class LevelManager : MonoBehaviour
     {
         if (enemySetup == null)
         {
-            Debug.LogError(
-                "LevelManager → EnemySetup is NULL!"
-            );
-
             return;
         }
 

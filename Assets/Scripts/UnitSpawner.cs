@@ -31,17 +31,10 @@ public class GameManager : MonoBehaviour
         public string cellName;
     }
 
-    private List<PlayerUnitSnapshot> playerSnapshot =
-        new List<PlayerUnitSnapshot>();
+    private List<PlayerUnitSnapshot> playerSnapshot = new List<PlayerUnitSnapshot>();
 
     private bool isFighting;
     private bool battleEnded;
-
-
-    // ========================================
-    // SAVE PLAYER SNAPSHOT
-    // ========================================
-
     private void SavePlayerSnapshot()
     {
         playerSnapshot.Clear();
@@ -59,56 +52,23 @@ public class GameManager : MonoBehaviour
             if (unit == null)
                 continue;
 
-            PlayerUnitSnapshot snapshot =
-                new PlayerUnitSnapshot();
+            PlayerUnitSnapshot snapshot = new PlayerUnitSnapshot();
 
             snapshot.unitType = unit.unitType;
             snapshot.level = unit.level;
             snapshot.cellName = cell.name;
 
             playerSnapshot.Add(snapshot);
-
-            Debug.Log(
-                "Snapshot → " +
-                snapshot.unitType +
-                " Lv" +
-                snapshot.level +
-                " | Cell " +
-                snapshot.cellName
-            );
         }
-
-        Debug.Log(
-            "GameManager → Player snapshot saved: " +
-            playerSnapshot.Count +
-            " units."
-        );
     }
-
-
-    // ========================================
-    // RESTORE PLAYER SNAPSHOT
-    // ========================================
 
     public void RestorePlayerSnapshot()
     {
-        Debug.Log(
-            "GameManager → Restoring Player snapshot..."
-        );
 
         if (unitPool == null)
         {
-            Debug.LogError(
-                "GameManager → UnitPool is NULL!"
-            );
-
             return;
         }
-
-        // ========================================
-        // CLEAR TOÀN BỘ PLAYER UNITS
-        // ========================================
-
         foreach (GridCell cell in playerCells)
         {
             if (cell == null)
@@ -119,19 +79,8 @@ public class GameManager : MonoBehaviour
             if (unit == null)
                 continue;
 
-            Debug.Log(
-                "Restore → Returning existing Player → " +
-                unit.name +
-                " | Cell " +
-                cell.name
-            );
-
             unitPool.ReturnPlayerUnit(unit);
         }
-
-        // ========================================
-        // KIỂM TRA CELL ĐÃ TRỐNG
-        // ========================================
 
         foreach (GridCell cell in playerCells)
         {
@@ -146,10 +95,6 @@ public class GameManager : MonoBehaviour
                 );
             }
         }
-
-        // ========================================
-        // RESTORE SNAPSHOT
-        // ========================================
 
         foreach (PlayerUnitSnapshot snapshot in playerSnapshot)
         {
@@ -169,118 +114,43 @@ public class GameManager : MonoBehaviour
 
             if (targetCell == null)
             {
-                Debug.LogError(
-                    "GameManager → Cannot find Player Cell: " +
-                    snapshot.cellName
-                );
-
                 continue;
             }
-
-            // ====================================
-            // CELL PHẢI TRỐNG
-            // ====================================
 
             if (targetCell.IsOccupied)
             {
-                Debug.LogError(
-                    "Restore → Cannot restore to occupied Cell: " +
-                    targetCell.name
-                );
-
                 continue;
             }
 
-            // ====================================
-            // GET PLAYER UNIT
-            // ====================================
-
-            Unit unit =
-                unitPool.GetPlayerUnit(
-                    snapshot.unitType,
-                    snapshot.level
-                );
+            Unit unit =unitPool.GetPlayerUnit(snapshot.unitType,snapshot.level);
 
             if (unit == null)
             {
-                Debug.LogError(
-                    "GameManager → Cannot restore Player Unit → " +
-                    snapshot.unitType +
-                    " Lv" +
-                    snapshot.level
-                );
-
                 continue;
             }
 
-            // ====================================
-            // SET CELL
-            // ====================================
-
             unit.SetCell(targetCell);
-
-            Debug.Log(
-                "RESTORE PLAYER → " +
-                snapshot.unitType +
-                " Lv" +
-                snapshot.level +
-                " | Cell " +
-                snapshot.cellName
-            );
         }
 
-        // ========================================
-        // RESET BATTLE STATE
-        // ========================================
 
         isFighting = false;
         battleEnded = false;
-
-        Debug.Log(
-            "GameManager → Player snapshot restored."
-        );
     }
-
-
-    // ========================================
-    // SPAWN MELEE
-    // ========================================
-
     public void SpawnMelee()
     {
         if (isFighting)
             return;
 
-        Debug.Log("Buy Melee button clicked!");
-
-        TryBuyAndSpawn(
-            meleeLv1Prefab,
-            UnitType.Melee
-        );
+        TryBuyAndSpawn(meleeLv1Prefab, UnitType.Melee);
     }
-
-
-    // ========================================
-    // SPAWN RANGED
-    // ========================================
 
     public void SpawnRanged()
     {
         if (isFighting)
             return;
 
-        Debug.Log("Buy Ranged button clicked!");
-
-        TryBuyAndSpawn(
-            rangedLv1Prefab,
-            UnitType.Ranged
-        );
+        TryBuyAndSpawn(rangedLv1Prefab,UnitType.Ranged);
     }
-
-
-    // ========================================
-    // START FIGHT
-    // ========================================
 
     public void StartFight()
     {
@@ -303,22 +173,9 @@ public class GameManager : MonoBehaviour
 
         if (!hasPlayerUnit)
         {
-            Debug.Log(
-                "Cannot start fight! Player has no units."
-            );
-
             return;
         }
-
-        // ========================================
-        // SAVE SNAPSHOT
-        // ========================================
-
         SavePlayerSnapshot();
-
-        // ========================================
-        // START BATTLE
-        // ========================================
 
         isFighting = true;
         battleEnded = false;
@@ -335,52 +192,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
-    // ========================================
-    // GET ENEMY CELLS
-    // ========================================
-
     public GridCell[] GetEnemyCells()
     {
         return enemyCells;
     }
-
-
-    // ========================================
-    // SPAWN PLAYER UNIT
-    // ========================================
-
-    private void TryBuyAndSpawn(
-    Unit prefab,
-    UnitType unitType)
+    private void TryBuyAndSpawn(Unit prefab,UnitType unitType)
     {
         if (prefab == null)
         {
-            Debug.LogError(
-                "GameManager → Unit prefab is NULL!"
-            );
             return;
         }
 
         if (unitPool == null)
         {
-            Debug.LogError(
-                "GameManager → UnitPool is NULL!"
-            );
             return;
         }
 
         if (goldManager == null)
         {
-            Debug.LogError(
-                "GameManager → GoldManager is NULL!"
-            );
             return;
         }
-
-        // --------------------------------
-        // 1. Tìm ô trống trước
-        // --------------------------------
 
         GridCell emptyCell = null;
 
@@ -398,158 +229,77 @@ public class GameManager : MonoBehaviour
 
         if (emptyCell == null)
         {
-            Debug.Log(
-                "GameManager → Player grid is full! " +
-                "Cannot buy Unit."
-            );
-
             return;
         }
-
-        // --------------------------------
-        // 2. Kiểm tra giá hiện tại
-        // --------------------------------
 
         int price;
 
         if (unitType == UnitType.Melee)
+        {
             price = goldManager.GetMeleePrice();
+        }
         else
+        {
             price = goldManager.GetRangedPrice();
+        }
+            
 
         if (!goldManager.CanAfford(price))
         {
-            Debug.Log(
-                "GameManager → Not enough Gold! " +
-                "Need: " +
-                price +
-                " | Current: " +
-                goldManager.GetGold()
-            );
-
             return;
         }
 
-        // --------------------------------
-        // 3. Lấy Unit từ Pool
-        // --------------------------------
 
-        Unit newUnit =
-            unitPool.GetPlayerUnit(
-                prefab.unitType,
-                prefab.level
-            );
+        Unit newUnit = unitPool.GetPlayerUnit(prefab.unitType, prefab.level);
 
         if (newUnit == null)
         {
-            Debug.LogError(
-                "GameManager → Cannot get Player Unit from Pool!"
-            );
-
             return;
         }
-
-        // --------------------------------
-        // 4. Trừ Gold + tăng giá
-        // --------------------------------
 
         bool purchaseSuccess;
 
         if (unitType == UnitType.Melee)
         {
-            purchaseSuccess =
-                goldManager.BuyMelee();
+            purchaseSuccess = goldManager.BuyMelee();
         }
         else
         {
-            purchaseSuccess =
-                goldManager.BuyRanged();
+            purchaseSuccess = goldManager.BuyRanged();
         }
-
-        // --------------------------------
-        // 5. Nếu mua thất bại → trả Unit về Pool
-        // --------------------------------
 
         if (!purchaseSuccess)
         {
             unitPool.ReturnPlayerUnit(newUnit);
-
-            Debug.Log(
-                "GameManager → Purchase failed → " +
-                "Unit returned to Pool."
-            );
-
             return;
         }
 
-        // --------------------------------
-        // 6. Spawn Unit
-        // --------------------------------
-
         newUnit.SetCell(emptyCell);
-
-        Debug.Log(
-            "PURCHASE SUCCESS → " +
-            unitType +
-            " Lv" +
-            newUnit.level +
-            " | Price: " +
-            price +
-            " | Cell: " +
-            emptyCell.name
-        );
     }
-
-
-    // ========================================
-    // GET NEXT LEVEL PREFAB
-    // ========================================
 
     public Unit GetNextLevelPrefab(Unit unit)
     {
-        if (unit == null)
-            return null;
+        if (unit == null) return null;
 
-        int nextLevel =
-            unit.level + 1;
+        int nextLevel = unit.level + 1;
 
-        if (nextLevel > 5)
-            return null;
+        if (nextLevel > 5) return null;
 
         if (unit.unitType == UnitType.Melee)
         {
-            if (
-                meleePrefabs == null ||
-                nextLevel - 1 >= meleePrefabs.Length
-            )
-                return null;
+            if (meleePrefabs == null || nextLevel - 1 >= meleePrefabs.Length)  return null;
 
             return meleePrefabs[nextLevel - 1];
         }
 
-        if (
-            rangedPrefabs == null ||
-            nextLevel - 1 >= rangedPrefabs.Length
-        )
-            return null;
+        if (rangedPrefabs == null || nextLevel - 1 >= rangedPrefabs.Length) return null;
 
         return rangedPrefabs[nextLevel - 1];
     }
-
-
-    // ========================================
-    // GET PLAYER CELLS
-    // ========================================
-
     public GridCell[] GetPlayerCells()
     {
         return playerCells;
     }
-
-
-    // ========================================
-    // START PLAYER COMBAT
-    // ========================================
 
     public void StartPlayerCombat()
     {
@@ -561,30 +311,19 @@ public class GameManager : MonoBehaviour
             if (!cell.IsOccupied)
                 continue;
 
-            Unit unit =
-                cell.currentUnit;
+            Unit unit = cell.currentUnit;
 
             if (unit == null)
                 continue;
 
-            // ====================================
-            // MELEE
-            // ====================================
-
-            UnitCombat meleeCombat =
-                unit.GetComponent<UnitCombat>();
+            UnitCombat meleeCombat = unit.GetComponent<UnitCombat>();
 
             if (meleeCombat != null)
             {
                 meleeCombat.StartCombat();
-            }
+            } 
 
-            // ====================================
-            // RANGED
-            // ====================================
-
-            RangedCombat rangedCombat =
-                unit.GetComponent<RangedCombat>();
+            RangedCombat rangedCombat = unit.GetComponent<RangedCombat>();
 
             if (rangedCombat != null)
             {
@@ -592,12 +331,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-
-    // ========================================
-    // CHECK VICTORY
-    // ========================================
-
     public void CheckVictory()
     {
         if (battleEnded)
@@ -618,48 +351,28 @@ public class GameManager : MonoBehaviour
 
         Victory();
     }
-
-
-    // ========================================
-    // VICTORY
-    // ========================================
-
     private void Victory()
     {
-        Debug.Log(
-            "PLAYER VICTORY!"
-        );
         GiveBattleReward(true);
-
-
-        // ====================================
-        // STOP PLAYER COMBAT
-        // ====================================
 
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null)
-                continue;
+            if (cell == null) continue;
 
-            if (!cell.IsOccupied)
-                continue;
+            if (!cell.IsOccupied) continue;
 
-            Unit unit =
-                cell.currentUnit;
+            Unit unit = cell.currentUnit;
 
-            if (unit == null)
-                continue;
+            if (unit == null) continue;
 
-            UnitCombat meleeCombat =
-                unit.GetComponent<UnitCombat>();
+            UnitCombat meleeCombat = unit.GetComponent<UnitCombat>();
 
             if (meleeCombat != null)
             {
                 meleeCombat.StopCombat();
             }
 
-            RangedCombat rangedCombat =
-                unit.GetComponent<RangedCombat>();
+            RangedCombat rangedCombat = unit.GetComponent<RangedCombat>();
 
             if (rangedCombat != null)
             {
@@ -667,60 +380,36 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // ====================================
-        // PLAYER VICTORY ANIMATION
-        // ====================================
-
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null)
-                continue;
+            if (cell == null) continue;
 
-            if (!cell.IsOccupied)
-                continue;
+            if (!cell.IsOccupied) continue;
 
-            Animator animator =
-                cell.currentUnit.GetComponent<Animator>();
+            Animator animator = cell.currentUnit.GetComponent<Animator>();
 
             if (animator != null)
             {
                 animator.ResetTrigger("Attack");
 
-                animator.SetBool(
-                    "IsMoving",
-                    false
-                );
+                animator.SetBool("IsMoving",false);
 
-                animator.SetTrigger(
-                    "Victory"
-                );
+                animator.SetTrigger("Victory");
             }
         }
-
-        // ====================================
-        // SHOW UI
-        // ====================================
 
         if (victoryUI != null)
         {
             victoryUI.ShowVictory();
         }
     }
-
-
-    // ========================================
-    // CHECK DEFEAT
-    // ========================================
-
     public void CheckDefeat()
     {
-        if (battleEnded)
-            return;
+        if (battleEnded) return;
 
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null)
-                continue;
+            if (cell == null) continue;
 
             if (cell.IsOccupied)
             {
@@ -733,16 +422,8 @@ public class GameManager : MonoBehaviour
         Defeat();
     }
 
-
-    // ========================================
-    // DEFEAT
-    // ========================================
-
     private void Defeat()
     {
-        Debug.Log(
-            "PLAYER DEFEAT!"
-        );
 
         GiveBattleReward(false);
 
@@ -753,98 +434,54 @@ public class GameManager : MonoBehaviour
             defeatUI.ShowDefeat();
         }
     }
-
-
-    // ========================================
-    // RESET PLAYER FOR NEXT LEVEL
-    // ========================================
-
     public void ResetPlayerForNextLevel()
     {
-        Debug.Log(
-            "GameManager → Reset Player for next level"
-        );
 
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null)
-                continue;
+            if (cell == null) continue;
 
-            if (!cell.IsOccupied)
-                continue;
+            if (!cell.IsOccupied) continue;
 
-            Unit unit =
-                cell.currentUnit;
+            Unit unit = cell.currentUnit;
 
-            if (unit == null)
-                continue;
+            if (unit == null) continue;
 
-            // ====================================
-            // STOP MELEE
-            // ====================================
-
-            UnitCombat meleeCombat =
-                unit.GetComponent<UnitCombat>();
+            UnitCombat meleeCombat = unit.GetComponent<UnitCombat>();
 
             if (meleeCombat != null)
             {
                 meleeCombat.StopCombat();
             }
 
-            // ====================================
-            // STOP RANGED
-            // ====================================
 
-            RangedCombat rangedCombat =
-                unit.GetComponent<RangedCombat>();
+            RangedCombat rangedCombat = unit.GetComponent<RangedCombat>();
 
             if (rangedCombat != null)
             {
                 rangedCombat.StopCombat();
             }
 
-            // ====================================
-            // RESET POSITION
-            // ====================================
+            if (unit.currentCell != null)
+            {
+                unit.transform.position = unit.currentCell.transform.position;
+            }
 
             if (unit.currentCell != null)
             {
-                unit.transform.position =
-                    unit.currentCell.transform.position;
+                unit.transform.rotation = unit.currentCell.transform.rotation;
             }
 
-            // ====================================
-            // RESET ROTATION
-            // ====================================
-
-            if (unit.currentCell != null)
-            {
-                unit.transform.rotation =
-                    unit.currentCell.transform.rotation;
-            }
-
-            // ====================================
-            // RESET ANIMATION
-            // ====================================
-
-            Animator animator =
-                unit.GetComponent<Animator>();
+            Animator animator = unit.GetComponent<Animator>();
 
             if (animator != null)
             {
                 animator.ResetTrigger("Attack");
                 animator.ResetTrigger("Victory");
 
-                animator.SetBool(
-                    "IsMoving",
-                    false
-                );
+                animator.SetBool("IsMoving", false);
 
-                animator.Play(
-                    "Idle",
-                    0,
-                    0f
-                );
+                animator.Play("Idle", 0, 0f);
             }
         }
 
@@ -855,22 +492,15 @@ public class GameManager : MonoBehaviour
     {
         if (goldManager == null)
         {
-            Debug.LogError(
-                "GameManager → GoldManager is NULL!"
-            );
             return;
         }
 
         if (enemySetup == null)
         {
-            Debug.LogError(
-                "GameManager → EnemySetup is NULL!"
-            );
             return;
         }
 
-        int totalEnemyHealth =
-            enemySetup.GetTotalEnemyMaxHealth();
+        int totalEnemyHealth = enemySetup.GetTotalEnemyMaxHealth();
 
         int reward;
 
@@ -885,21 +515,9 @@ public class GameManager : MonoBehaviour
 
         if (reward <= 0)
         {
-            Debug.LogWarning(
-                "GameManager → Battle reward is 0."
-            );
             return;
         }
 
         goldManager.AddGold(reward);
-
-        Debug.Log(
-            "BATTLE REWARD → " +
-            (victory ? "VICTORY" : "DEFEAT") +
-            " | Enemy Max HP: " +
-            totalEnemyHealth +
-            " | Gold Reward: +" +
-            reward
-        );
     }
 }

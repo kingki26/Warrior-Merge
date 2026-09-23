@@ -8,8 +8,7 @@ public class EnemySetup : MonoBehaviour
 
     [Header("JSON")]
     [SerializeField]
-    private string jsonFileName =
-        "Levels/level_data_1_50_Melee_Ranged";
+    private string jsonFileName = "Levels/level_data_1_50_Melee_Ranged";
 
     [Header("References")]
     [SerializeField] private GameManager gameManager;
@@ -18,11 +17,9 @@ public class EnemySetup : MonoBehaviour
     [Header("Boss Prefabs")]
     [SerializeField] private BossUnit[] bossPrefabs;
 
-    private List<Unit> enemyUnits =
-        new List<Unit>();
+    private List<Unit> enemyUnits = new List<Unit>();
 
-    private List<BossUnit> bossUnits =
-        new List<BossUnit>();
+    private List<BossUnit> bossUnits = new List<BossUnit>();
 
     private LevelDataList levelDatabase;
 
@@ -38,56 +35,32 @@ public class EnemySetup : MonoBehaviour
 
         if (jsonFile == null)
         {
-            //Debug.LogError(
-            //    "EnemySetup → Cannot find JSON: " +
-            //    jsonFileName
-            //);
             return;
         }
 
-        levelDatabase =
-            JsonUtility.FromJson<LevelDataList>(
-                jsonFile.text
-            );
+        levelDatabase = JsonUtility.FromJson<LevelDataList> (jsonFile.text);
 
         if (levelDatabase == null ||
             levelDatabase.levels == null)
         {
-            //Debug.LogError(
-            //    "EnemySetup → Failed to read JSON!"
-            //);
             return;
         }
-
-        //Debug.Log(
-        //    "EnemySetup → JSON loaded! Levels: " +
-        //    levelDatabase.levels.Count
-        //);
     }
 
     public void SetupLevel(int level)
     {
-        //Debug.Log("EnemySetup → Setup Level " + level);
 
         ClearEnemies();
 
         if (levelDatabase == null)
         {
-            //Debug.LogError(
-            //    "EnemySetup → Level database is NULL!"
-            //);
             return;
         }
 
-        LevelData levelData =
-            FindLevelData(level);
+        LevelData levelData = FindLevelData(level);
 
         if (levelData == null)
         {
-            //Debug.LogError(
-            //    "EnemySetup → No data for Level " +
-            //    level
-            //);
             return;
         }
 
@@ -110,19 +83,12 @@ public class EnemySetup : MonoBehaviour
 
     private void SpawnEnemy(EnemyData enemyData)
     {
-        // =========================
-        // BOSS
-        // =========================
 
         if (enemyData.type == "Boss")
         {
             SpawnBoss(enemyData);
             return;
         }
-
-        // =========================
-        // NORMAL ENEMY
-        // =========================
 
         UnitType unitType;
 
@@ -132,18 +98,11 @@ public class EnemySetup : MonoBehaviour
             unitType = UnitType.Ranged;
         else
         {
-            //Debug.LogError(
-            //    "EnemySetup → Unknown enemy type: " +
-            //    enemyData.type
-            //);
             return;
         }
 
         if (unitPool == null)
         {
-            //Debug.LogError(
-            //    "EnemySetup → UnitPool is NULL!"
-            //);
             return;
         }
 
@@ -154,19 +113,11 @@ public class EnemySetup : MonoBehaviour
 
             if (cell == null)
             {
-                //Debug.LogError(
-                //    "EnemySetup → Cell not found: " +
-                //    enemyData.cell
-                //);
                 return;
             }
 
             if (cell.IsOccupied)
             {
-                //Debug.LogError(
-                //    "EnemySetup → Cell already occupied: " +
-                //    enemyData.cell
-                //);
                 return;
             }
 
@@ -178,13 +129,6 @@ public class EnemySetup : MonoBehaviour
 
             return;
         }
-
-        //Debug.LogWarning(
-        //    "EnemySetup → Enemy has no cell → " +
-        //    enemyData.type +
-        //    " Lv" +
-        //    enemyData.level
-        //);
     }
 
     private void SpawnEnemyAtCell(
@@ -200,92 +144,47 @@ public class EnemySetup : MonoBehaviour
 
         if (enemy == null)
         {
-            //Debug.LogError(
-            //    "EnemySetup → Cannot get Enemy from Pool → " +
-            //    unitType +
-            //    " Lv" +
-            //    level
-            //);
             return;
         }
 
         enemy.level = level;
         enemy.SetCell(cell);
         enemyUnits.Add(enemy);
-
-        //Debug.Log(
-        //    "Spawn Enemy → " +
-        //    enemy.name +
-        //    " | " +
-        //    enemy.unitType +
-        //    " Lv" +
-        //    level +
-        //    " | Cell " +
-        //    cell.name
-        //);
     }
 
     private void SpawnBoss(EnemyData enemyData)
     {
         if (string.IsNullOrEmpty(enemyData.bossLevel))
         {
-            Debug.LogError(
-                "EnemySetup → Boss has no bossLevel!"
-            );
             return;
         }
 
-        GridCell cell =
-            FindCellByName(enemyData.cell);
+        GridCell cell = FindCellByName(enemyData.cell);
 
         if (cell == null)
         {
-            Debug.LogError(
-                "EnemySetup → Boss Cell not found: " +
-                enemyData.cell
-            );
             return;
         }
 
         if (cell.IsOccupied)
         {
-            Debug.LogError(
-                "EnemySetup → Boss Cell already occupied: " +
-                enemyData.cell
-            );
             return;
         }
 
-        BossUnit boss =
-            FindBossPrefab(enemyData.bossLevel);
+        BossUnit boss =  FindBossPrefab(enemyData.bossLevel);
 
         if (boss == null)
         {
-            Debug.LogError(
-                "EnemySetup → Boss prefab not found: " +
-                enemyData.bossLevel
-            );
             return;
         }
 
-        BossUnit newBoss =
-            Instantiate(boss);
+        BossUnit newBoss = Instantiate(boss);
 
-        newBoss.bossLevel =
-            enemyData.bossLevel;
+        newBoss.bossLevel = enemyData.bossLevel;
 
         newBoss.SetCell(cell);
 
         bossUnits.Add(newBoss);
-
-        Debug.Log(
-            "Spawn Boss → " +
-            newBoss.name +
-            " | " +
-            newBoss.bossLevel +
-            " | Cell " +
-            cell.name
-        );
     }
 
     private BossUnit FindBossPrefab(string bossLevel)
@@ -351,10 +250,6 @@ public class EnemySetup : MonoBehaviour
         }
 
         bossUnits.Clear();
-
-        Debug.Log(
-            "EnemySetup → Old enemies and Bosses cleared."
-        );
     }
 
     public void StartFight()
@@ -364,17 +259,19 @@ public class EnemySetup : MonoBehaviour
             if (enemy == null)
                 continue;
 
-            UnitCombat meleeCombat =
-                enemy.GetComponent<UnitCombat>();
+            UnitCombat meleeCombat = enemy.GetComponent<UnitCombat>();
 
             if (meleeCombat != null)
+            {
                 meleeCombat.StartCombat();
+            }
 
-            RangedCombat rangedCombat =
-                enemy.GetComponent<RangedCombat>();
+            RangedCombat rangedCombat = enemy.GetComponent<RangedCombat>();
 
             if (rangedCombat != null)
+            {
                 rangedCombat.StartCombat();
+            }
         }
 
         foreach (BossUnit boss in bossUnits)
@@ -382,21 +279,26 @@ public class EnemySetup : MonoBehaviour
             if (boss == null)
                 continue;
 
-            UnitCombat meleeCombat =
-                boss.GetComponent<UnitCombat>();
+            UnitCombat meleeCombat = boss.GetComponent<UnitCombat>();
 
             if (meleeCombat != null)
+            {
                 meleeCombat.StartCombat();
+            }
 
-            RangedCombat rangedCombat =
-                boss.GetComponent<RangedCombat>();
+            RangedCombat rangedCombat = boss.GetComponent<RangedCombat>();
 
             if (rangedCombat != null)
+            {
                 rangedCombat.StartCombat();
+            }
         }
 
         if (gameManager != null)
+        {
             gameManager.StartPlayerCombat();
+        }
+
         else
             Debug.LogError(
                 "EnemySetup → GameManager is NULL!"
@@ -413,8 +315,7 @@ public class EnemySetup : MonoBehaviour
             if (enemy == null)
                 continue;
 
-            UnitHealth health =
-                enemy.GetComponent<UnitHealth>();
+            UnitHealth health =  enemy.GetComponent<UnitHealth>();
 
             if (health == null)
                 continue;
@@ -428,8 +329,7 @@ public class EnemySetup : MonoBehaviour
             if (boss == null)
                 continue;
 
-            UnitHealth health =
-                boss.GetComponent<UnitHealth>();
+            UnitHealth health = boss.GetComponent<UnitHealth>();
 
             if (health == null)
                 continue;

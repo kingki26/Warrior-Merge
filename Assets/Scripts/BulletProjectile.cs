@@ -38,64 +38,32 @@ public class BulletProjectile : MonoBehaviour
         if (!initialized)
             return;
 
-        // ========================================
-        // TARGET CÒN TỒN TẠI
-        // ========================================
-
         if (target != null)
         {
-            // Liên tục cập nhật vị trí target
-            targetPosition =
-                target.transform.position;
+            targetPosition = target.transform.position;
         }
 
-        // ========================================
-        // BAY TỚI VỊ TRÍ TARGET
-        // ========================================
 
-        Vector3 direction =
-            targetPosition -
-            transform.position;
+        Vector3 direction = targetPosition - transform.position;
 
-        float distance =
-            direction.magnitude;
+        float distance = direction.magnitude;
 
-        // Đã tới vị trí target
         if (distance <= hitDistance)
         {
             HitTarget();
             return;
         }
 
-        // ========================================
-        // DI CHUYỂN
-        // ========================================
 
-        Vector3 moveDirection =
-            direction.normalized;
+        Vector3 moveDirection = direction.normalized;
 
-        transform.position +=
-            moveDirection *
-            speed *
-            Time.deltaTime;
-
-        // ========================================
-        // XOAY THEO HƯỚNG BAY
-        // ========================================
+        transform.position += moveDirection * speed * Time.deltaTime;
 
         if (moveDirection != Vector3.zero)
         {
-            transform.rotation =
-                Quaternion.LookRotation(
-                    moveDirection
-                );
+            transform.rotation = Quaternion.LookRotation(moveDirection);
         }
     }
-
-    // ========================================
-    // HIT TARGET
-    // ========================================
-
     private void HitTarget()
     {
 
@@ -105,57 +73,28 @@ public class BulletProjectile : MonoBehaviour
 
             if (target != null)
             {
-                // Spawn effect trên Enemy
-                effect = Instantiate(
-                    hitEffect,
-                    target.transform.position,
-                    Quaternion.identity,
-                    target.transform
-                );
+                effect = Instantiate(hitEffect,target.transform.position,Quaternion.identity,target.transform);
             }
             else
             {
-                // Target đã bị Destroy
-                effect = Instantiate(
-                    hitEffect,
-                    transform.position,
-                    Quaternion.identity
-                );
+                effect = Instantiate(hitEffect,transform.position,Quaternion.identity);
             }
 
-            // Tự hủy effect sau một khoảng thời gian
-            Destroy(
-                effect,
-                hitEffectDuration
-            );
+            Destroy(effect,hitEffectDuration);
         }
-        // Target đã chết / bị Destroy
         if (target == null)
         {
-            Debug.Log(
-                gameObject.name +
-                " reached target position, " +
-                "but target no longer exists."
-            );
+            
 
             Destroy(gameObject);
             return;
         }
 
-        UnitHealth targetHealth =
-            target.GetComponent<UnitHealth>();
+        UnitHealth targetHealth = target.GetComponent<UnitHealth>();
 
-        // Target vẫn còn sống → gây damage
         if (targetHealth != null &&
             !targetHealth.IsDead())
         {
-            Debug.Log(
-                gameObject.name +
-                " hit " +
-                target.name +
-                " | Damage: " +
-                damage
-            );
 
             targetHealth.TakeDamage(damage);
         }

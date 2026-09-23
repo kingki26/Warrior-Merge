@@ -64,14 +64,6 @@ public class GoldManager : MonoBehaviour
     {
         if (!CanAfford(currentMeleePrice))
         {
-            Debug.Log(
-                "GoldManager → Not enough Gold for Melee! " +
-                "Need: " +
-                currentMeleePrice +
-                " | Current: " +
-                currentGold
-            );
-
             return false;
         }
 
@@ -79,15 +71,6 @@ public class GoldManager : MonoBehaviour
 
         currentGold -= price;
         currentMeleePrice += meleePriceIncrease;
-
-        Debug.Log(
-            "BUY MELEE → Spent: " +
-            price +
-            " | Remaining Gold: " +
-            currentGold +
-            " | Next Price: " +
-            currentMeleePrice
-        );
 
         UpdateUI();
 
@@ -98,14 +81,6 @@ public class GoldManager : MonoBehaviour
     {
         if (!CanAfford(currentRangedPrice))
         {
-            Debug.Log(
-                "GoldManager → Not enough Gold for Ranged! " +
-                "Need: " +
-                currentRangedPrice +
-                " | Current: " +
-                currentGold
-            );
-
             return false;
         }
 
@@ -113,15 +88,6 @@ public class GoldManager : MonoBehaviour
 
         currentGold -= price;
         currentRangedPrice += rangedPriceIncrease;
-
-        Debug.Log(
-            "BUY RANGED → Spent: " +
-            price +
-            " | Remaining Gold: " +
-            currentGold +
-            " | Next Price: " +
-            currentRangedPrice
-        );
 
         UpdateUI();
 
@@ -135,13 +101,6 @@ public class GoldManager : MonoBehaviour
 
         currentGold += amount;
 
-        Debug.Log(
-            "GoldManager → Added " +
-            amount +
-            " Gold | Current: " +
-            currentGold
-        );
-
         UpdateUI();
     }
 
@@ -149,22 +108,17 @@ public class GoldManager : MonoBehaviour
     {
         if (meleePriceText != null)
         {
-            meleePriceText.text =
-                "Melee: " +
-                FormatGold(currentMeleePrice);
+            meleePriceText.text = "Melee: " + FormatGold(currentMeleePrice);
         }
 
         if (rangedPriceText != null)
         {
-            rangedPriceText.text =
-                "Range: " +
-                FormatGold(currentRangedPrice);
+            rangedPriceText.text = "Range: " + FormatGold(currentRangedPrice);
         }
 
         if (goldText != null)
         {
-            goldText.text =
-                FormatGold(currentGold);
+            goldText.text = FormatGold(currentGold);
         }
     }
 
@@ -172,14 +126,12 @@ public class GoldManager : MonoBehaviour
     {
         if (amount >= 1000000)
         {
-            return (amount / 1000000f)
-                .ToString("0.#") + "M";
+            return (amount / 1000000f).ToString("0.#") + "M";
         }
 
         if (amount >= 1000)
         {
-            return (amount / 1000f)
-                .ToString("0.#") + "k";
+            return (amount / 1000f).ToString("0.#") + "k";
         }
 
         return amount.ToString();

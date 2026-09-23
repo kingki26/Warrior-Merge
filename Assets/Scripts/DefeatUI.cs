@@ -5,6 +5,9 @@ public class DefeatUI : MonoBehaviour
     [Header("Defeat Panel")]
     [SerializeField] private GameObject defeatPanel;
 
+    [Header("Other UI")]
+    [SerializeField] private GameObject levelAmount;
+
     private void Start()
     {
         HideDefeat();
@@ -16,6 +19,11 @@ public class DefeatUI : MonoBehaviour
         {
             defeatPanel.SetActive(true);
         }
+
+        if (levelAmount != null)
+        {
+            levelAmount.SetActive(false);
+        }
     }
 
     public void HideDefeat()
@@ -23,6 +31,11 @@ public class DefeatUI : MonoBehaviour
         if (defeatPanel != null)
         {
             defeatPanel.SetActive(false);
+        }
+
+        if (levelAmount != null)
+        {
+            levelAmount.SetActive(true);
         }
     }
 }

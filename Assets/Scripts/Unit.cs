@@ -54,11 +54,9 @@ public class Unit : MonoBehaviour
     {
         currentCell = null;
 
-        transform.rotation =
-            Quaternion.identity;
+        transform.rotation = Quaternion.identity;
 
-        UnitHealth health =
-            GetComponent<UnitHealth>();
+        UnitHealth health = GetComponent<UnitHealth>();
 
 
         if (health != null)
@@ -66,32 +64,28 @@ public class Unit : MonoBehaviour
             health.ResetHealth();
         }
 
-        Canvas healthBarCanvas =
-        GetComponentInChildren<Canvas>();
+        Canvas healthBarCanvas = GetComponentInChildren<Canvas>();
 
         if (healthBarCanvas != null)
         {
             healthBarCanvas.gameObject.SetActive(true);
         }
 
-        UnitCombat meleeCombat =
-            GetComponent<UnitCombat>();
+        UnitCombat meleeCombat = GetComponent<UnitCombat>();
 
         if (meleeCombat != null)
         {
             meleeCombat.StopCombat();
         }
 
-        RangedCombat rangedCombat =
-            GetComponent<RangedCombat>();
+        RangedCombat rangedCombat = GetComponent<RangedCombat>();
 
         if (rangedCombat != null)
         {
             rangedCombat.StopCombat();
         }
 
-        Animator animator =
-            GetComponent<Animator>();
+        Animator animator = GetComponent<Animator>();
 
         if (animator != null)
         {
@@ -99,16 +93,9 @@ public class Unit : MonoBehaviour
             animator.ResetTrigger("Victory");
             animator.ResetTrigger("Die");
 
-            animator.SetBool(
-                "IsMoving",
-                false
-            );
+            animator.SetBool("IsMoving",false);
 
-            animator.Play(
-                "Idle",
-                0,
-                0f
-            );
+            animator.Play("Idle",0, 0f);
         }
     }
 }

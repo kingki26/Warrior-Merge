@@ -19,11 +19,6 @@ public class UnitHealth : MonoBehaviour
 
         ResetHealth();
     }
-
-    // =========================================================
-    // HEALTH
-    // =========================================================
-
     public int GetMaxHealth()
     {
         return maxHealth;
@@ -42,10 +37,6 @@ public class UnitHealth : MonoBehaviour
         return (float)currentHealth / maxHealth;
     }
 
-    // =========================================================
-    // RESET
-    // =========================================================
-
     public void ResetHealth()
     {
         CancelInvoke(nameof(ReturnToPool));
@@ -59,32 +50,19 @@ public class UnitHealth : MonoBehaviour
             animator.ResetTrigger("Attack");
             animator.ResetTrigger("Victory");
 
-            animator.SetBool(
-                "IsMoving",
-                false
-            );
+            animator.SetBool( "IsMoving",false);
 
-            animator.Play(
-                "Idle",
-                0,
-                0f
-            );
+            animator.Play("Idle", 0, 0f);
         }
 
         // Cập nhật HP Bar về đầy
-        HealthBar healthBar =
-            GetComponentInChildren<HealthBar>();
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
 
         if (healthBar != null)
         {
             healthBar.Setup();
         }
     }
-
-    // =========================================================
-    // TAKE DAMAGE
-    // =========================================================
-
     public void TakeDamage(int damage)
     {
         if (isDead)
@@ -95,25 +73,11 @@ public class UnitHealth : MonoBehaviour
 
         currentHealth -= damage;
 
-        currentHealth =
-            Mathf.Max(
-                currentHealth,
-                0
-            );
+        currentHealth = Mathf.Max(currentHealth, 0);
 
-        Debug.Log(
-            gameObject.name +
-            " RECEIVED DAMAGE: " +
-            damage +
-            " | HP: " +
-            currentHealth +
-            "/" +
-            maxHealth
-        );
 
         // Cập nhật HP Bar
-        HealthBar healthBar =
-            GetComponentInChildren<HealthBar>();
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
 
         if (healthBar != null)
         {
@@ -125,11 +89,6 @@ public class UnitHealth : MonoBehaviour
             Die();
         }
     }
-
-    // =========================================================
-    // DIE
-    // =========================================================
-
     private void Die()
     {
         if (isDead)
@@ -139,26 +98,18 @@ public class UnitHealth : MonoBehaviour
 
         CancelInvoke(nameof(ReturnToPool));
 
-        Debug.Log(
-            gameObject.name +
-            " died!"
-        );
 
-        Unit unit =
-            GetComponent<Unit>();
+        Unit unit = GetComponent<Unit>();
 
-        if (unit != null &&
-            unit.currentCell != null)
+        if (unit != null && unit.currentCell != null)
         {
-            ownerTeam =
-                unit.currentCell.team;
+            ownerTeam = unit.currentCell.team;
 
             unit.currentCell.RemoveUnit();
 
             unit.currentCell = null;
 
-            GameManager gameManager =
-                FindAnyObjectByType<GameManager>();
+            GameManager gameManager = FindAnyObjectByType<GameManager>();
 
             if (gameManager != null)
             {
@@ -168,8 +119,7 @@ public class UnitHealth : MonoBehaviour
         }
 
         // HP Bar về 0
-        HealthBar healthBar =
-            GetComponentInChildren<HealthBar>();
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
 
         if (healthBar != null)
         {
@@ -183,20 +133,12 @@ public class UnitHealth : MonoBehaviour
         }
 
         // Sau 2 giây trả về Pool
-        Invoke(
-            nameof(ReturnToPool),
-            2f
-        );
+        Invoke( nameof(ReturnToPool),2f);
     }
-
-    // =========================================================
-    // RETURN TO POOL
-    // =========================================================
 
     private void ReturnToPool()
     {
-        Unit unit =
-            GetComponent<Unit>();
+        Unit unit = GetComponent<Unit>();
 
         if (unit == null)
         {
@@ -204,15 +146,10 @@ public class UnitHealth : MonoBehaviour
             return;
         }
 
-        UnitPool unitPool =
-            FindAnyObjectByType<UnitPool>();
+        UnitPool unitPool = FindAnyObjectByType<UnitPool>();
 
         if (unitPool == null)
         {
-            Debug.LogError(
-                "UnitHealth → UnitPool not found!"
-            );
-
             gameObject.SetActive(false);
 
             return;
@@ -222,11 +159,6 @@ public class UnitHealth : MonoBehaviour
         {
             unitPool.ReturnPlayerUnit(unit);
 
-            Debug.Log(
-                "UnitHealth → Returned Player Unit → " +
-                unit.name
-            );
-
             return;
         }
 
@@ -234,25 +166,11 @@ public class UnitHealth : MonoBehaviour
         {
             unitPool.ReturnEnemyUnit(unit);
 
-            Debug.Log(
-                "UnitHealth → Returned Enemy Unit → " +
-                unit.name
-            );
-
             return;
         }
 
-        Debug.LogError(
-            "UnitHealth → Unknown owner Team for Unit → " +
-            unit.name
-        );
-
         unit.gameObject.SetActive(false);
     }
-
-    // =========================================================
-    // STATUS
-    // =========================================================
 
     public bool IsDead()
     {
