@@ -18,7 +18,10 @@ public class GoldManager : MonoBehaviour
     [SerializeField] private TMP_Text meleePriceText;
     [SerializeField] private TMP_Text rangedPriceText;
     [SerializeField] private TMP_Text goldText;
-    
+
+    [SerializeField] private GameObject meleeAdIcon;
+    [SerializeField] private GameObject rangedAdIcon;
+
 
     private int currentGold;
 
@@ -106,14 +109,37 @@ public class GoldManager : MonoBehaviour
 
     private void UpdateUI()
     {
+        bool canBuyMelee = CanAfford(currentMeleePrice);
+        bool canBuyRanged = CanAfford(currentRangedPrice);
+
         if (meleePriceText != null)
         {
-            meleePriceText.text = "Melee: " + FormatGold(currentMeleePrice);
+            meleePriceText.gameObject.SetActive(canBuyMelee);
+
+            if (canBuyMelee)
+            {
+                meleePriceText.text = "Melee: " + FormatGold(currentMeleePrice);
+            }
         }
 
         if (rangedPriceText != null)
         {
-            rangedPriceText.text = "Range: " + FormatGold(currentRangedPrice);
+            rangedPriceText.gameObject.SetActive(canBuyRanged);
+
+            if (canBuyRanged)
+            {
+                rangedPriceText.text = "Range: " + FormatGold(currentRangedPrice);
+            }
+        }
+
+        if (meleeAdIcon != null)
+        {
+            meleeAdIcon.SetActive(!canBuyMelee);
+        }
+
+        if (rangedAdIcon != null)
+        {
+            rangedAdIcon.SetActive(!canBuyRanged);
         }
 
         if (goldText != null)
@@ -135,5 +161,14 @@ public class GoldManager : MonoBehaviour
         }
 
         return amount.ToString();
+    }
+
+    public void ClearData()
+    {
+        currentGold = 100;
+        currentMeleePrice = meleeStartingPrice;
+        currentRangedPrice = rangedStartingPrice;
+
+        UpdateUI();
     }
 }

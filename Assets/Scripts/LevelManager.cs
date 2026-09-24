@@ -92,4 +92,27 @@ public class LevelManager : MonoBehaviour
 
         enemySetup.SetupLevel(currentLevel);
     }
+
+    public void ClearData()
+    {
+        currentLevel = 1;
+
+        if (gameManager != null)
+        {
+            gameManager.ClearData();
+        }
+
+        if (victoryUI != null)
+        {
+            victoryUI.HideVictory();
+        }
+
+        if (defeatUI != null)
+        {
+            defeatUI.HideDefeat();
+        }
+
+        UpdateLevelUI();
+        LoadCurrentLevel();
+    }
 }

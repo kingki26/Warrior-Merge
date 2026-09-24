@@ -15,37 +15,62 @@ public class BulletProjectile : MonoBehaviour
 
     private bool initialized;
 
-    // Vị trí cuối cùng của target
     private Vector3 targetPosition;
+
+    private BulletPool bulletPool;
+    private BulletProjectile bulletPrefab;
+
+    private ParticleSystem[] particleSystems;
+
+    private void Awake()
+    {
+        particleSystems = GetComponentsInChildren<ParticleSystem>(true);
+    }
+
+    public void InitPool(BulletPool pool, BulletProjectile prefab)
+    {
+        bulletPool = pool;
+        bulletPrefab = prefab;
+    }
 
     public void Setup(Unit newTarget, int newDamage)
     {
         target = newTarget;
         damage = newDamage;
 
-        // Lưu vị trí ban đầu của target
         if (target != null)
         {
-            targetPosition =
-                target.transform.position;
+            targetPosition = target.transform.position;
         }
 
         initialized = true;
+
+        PlayParticleEffects();
+    }
+
+    public void ResetBullet()
+    {
+        target = null;
+        damage = 0;
+        targetPosition = Vector3.zero;
+        initialized = false;
+
+        StopParticleEffects();
     }
 
     private void Update()
     {
         if (!initialized)
+        {
             return;
+        }
 
         if (target != null)
         {
             targetPosition = target.transform.position;
         }
 
-
         Vector3 direction = targetPosition - transform.position;
-
         float distance = direction.magnitude;
 
         if (distance <= hitDistance)
@@ -53,7 +78,6 @@ public class BulletProjectile : MonoBehaviour
             HitTarget();
             return;
         }
-
 
         Vector3 moveDirection = direction.normalized;
 
@@ -64,41 +88,76 @@ public class BulletProjectile : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(moveDirection);
         }
     }
+
     private void HitTarget()
     {
-
         if (hitEffect != null)
         {
             GameObject effect;
 
             if (target != null)
             {
-                effect = Instantiate(hitEffect,target.transform.position,Quaternion.identity,target.transform);
+                effect = Instantiate(hitEffect, target.transform.position, Quaternion.identity);
             }
             else
             {
-                effect = Instantiate(hitEffect,transform.position,Quaternion.identity);
+                effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
             }
 
-            Destroy(effect,hitEffectDuration);
+            Destroy(effect, hitEffectDuration);
         }
+
         if (target == null)
         {
-            
-
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
 
-        UnitHealth targetHealth = target.GetComponent<UnitHealth>();
+        UnitHealth targetHealth = target.Health;
 
-        if (targetHealth != null &&
-            !targetHealth.IsDead())
+        if (targetHealth != null && !targetHealth.IsDead())
         {
-
             targetHealth.TakeDamage(damage);
         }
 
-        Destroy(gameObject);
+        ReturnToPool();
+    }
+
+    private void PlayParticleEffects()
+    {
+        if (particleSystems == null)
+        {
+            return;
+        }
+
+        foreach (ParticleSystem particleSystem in particleSystems)
+        {
+            particleSystem.Play(true);
+        }
+    }
+
+    private void StopParticleEffects()
+    {
+        if (particleSystems == null)
+        {
+            return;
+        }
+
+        foreach (ParticleSystem particleSystem in particleSystems)
+        {
+            particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+    }
+
+    private void ReturnToPool()
+    {
+        if (bulletPool == null || bulletPrefab == null)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
+        ResetBullet();
+        bulletPool.ReturnBullet(this, bulletPrefab);
     }
 }

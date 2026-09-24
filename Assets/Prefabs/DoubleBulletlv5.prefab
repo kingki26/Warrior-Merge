@@ -10263,7 +10263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BulletProjectile
   hitEffect: {fileID: 3287572108165585598, guid: 1c255d5331efcb94388962845050a30c, type: 3}
   hitEffectDuration: 0.3
-  speed: 20
+  speed: 25
   hitDistance: 0.2
 --- !u!1 &8770382926730193909
 GameObject:

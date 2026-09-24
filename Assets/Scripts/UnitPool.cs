@@ -41,11 +41,7 @@ public class UnitPool : MonoBehaviour
         CreatePool(enemyPools,UnitType.Ranged,enemyRangedPrefabs);
     }
 
-    private void CreatePool(
-        Dictionary<string, Queue<Unit>> targetPools,
-        UnitType unitType,
-        Unit[] prefabs
-    )
+    private void CreatePool(Dictionary<string, Queue<Unit>> targetPools,UnitType unitType, Unit[] prefabs)
     {
         if (prefabs == null)
             return;
@@ -75,10 +71,7 @@ public class UnitPool : MonoBehaviour
             targetPools[key] = unitQueue;
         }
     }
-    public Unit GetPlayerUnit(
-        UnitType unitType,
-        int level
-    )
+    public Unit GetPlayerUnit(UnitType unitType, int level)
     {
         return GetUnitFromPool(playerPools, unitType, level,"Player");
     }
@@ -103,7 +96,7 @@ public class UnitPool : MonoBehaviour
 
             if (unit == null)
             {
-                return GetUnitFromPool( targetPools,unitType, level, owner );
+                return GetUnitFromPool( targetPools,unitType, level, owner);
             }
 
             unit.ResetForReuse();
@@ -120,7 +113,7 @@ public class UnitPool : MonoBehaviour
             return null;
         }
 
-        Unit newUnit =Instantiate(prefab,transform);
+        Unit newUnit = Instantiate(prefab,transform);
 
         newUnit.ResetForReuse();
 

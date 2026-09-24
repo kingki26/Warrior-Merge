@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     private bool isFighting;
     private bool battleEnded;
+
     private void SavePlayerSnapshot()
     {
         playerSnapshot.Clear();
@@ -64,11 +66,11 @@ public class GameManager : MonoBehaviour
 
     public void RestorePlayerSnapshot()
     {
-
         if (unitPool == null)
         {
             return;
         }
+
         foreach (GridCell cell in playerCells)
         {
             if (cell == null)
@@ -122,7 +124,7 @@ public class GameManager : MonoBehaviour
                 continue;
             }
 
-            Unit unit =unitPool.GetPlayerUnit(snapshot.unitType,snapshot.level);
+            Unit unit = unitPool.GetPlayerUnit(snapshot.unitType, snapshot.level);
 
             if (unit == null)
             {
@@ -130,18 +132,20 @@ public class GameManager : MonoBehaviour
             }
 
             unit.SetCell(targetCell);
-        }
 
+            InitializeCombat(unit);
+        }
 
         isFighting = false;
         battleEnded = false;
     }
+
     public void SpawnMelee()
     {
         if (isFighting)
             return;
 
-        TryBuyAndSpawn(meleeLv1Prefab, UnitType.Melee);
+        TryBuyAndSpawn(meleeLv1Prefab,UnitType.Melee);
     }
 
     public void SpawnRanged()
@@ -149,7 +153,7 @@ public class GameManager : MonoBehaviour
         if (isFighting)
             return;
 
-        TryBuyAndSpawn(rangedLv1Prefab,UnitType.Ranged);
+        TryBuyAndSpawn(rangedLv1Prefab, UnitType.Ranged);
     }
 
     public void StartFight()
@@ -175,6 +179,7 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
+
         SavePlayerSnapshot();
 
         isFighting = true;
@@ -196,7 +201,10 @@ public class GameManager : MonoBehaviour
     {
         return enemyCells;
     }
-    private void TryBuyAndSpawn(Unit prefab,UnitType unitType)
+
+    private void TryBuyAndSpawn(
+        Unit prefab,
+        UnitType unitType)
     {
         if (prefab == null)
         {
@@ -242,15 +250,13 @@ public class GameManager : MonoBehaviour
         {
             price = goldManager.GetRangedPrice();
         }
-            
 
         if (!goldManager.CanAfford(price))
         {
             return;
         }
 
-
-        Unit newUnit = unitPool.GetPlayerUnit(prefab.unitType, prefab.level);
+        Unit newUnit = unitPool.GetPlayerUnit(prefab.unitType,prefab.level);
 
         if (newUnit == null)
         {
@@ -275,27 +281,50 @@ public class GameManager : MonoBehaviour
         }
 
         newUnit.SetCell(emptyCell);
+
+        InitializeCombat(newUnit);
+    }
+
+    private void InitializeCombat(Unit unit)
+    {
+        if (unit == null)
+            return;
+
+        if (unit.Combat != null)
+            unit.Combat.Init(unit, this);
+
+        if (unit.RangedCombat != null)
+            unit.RangedCombat.Init(unit, this);
     }
 
     public Unit GetNextLevelPrefab(Unit unit)
     {
-        if (unit == null) return null;
+        if (unit == null)
+            return null;
 
         int nextLevel = unit.level + 1;
 
-        if (nextLevel > 5) return null;
+        if (nextLevel > 5)
+            return null;
 
         if (unit.unitType == UnitType.Melee)
         {
-            if (meleePrefabs == null || nextLevel - 1 >= meleePrefabs.Length)  return null;
+            if (meleePrefabs == null || nextLevel - 1 >= meleePrefabs.Length)
+            {
+                return null;
+            }
 
             return meleePrefabs[nextLevel - 1];
         }
 
-        if (rangedPrefabs == null || nextLevel - 1 >= rangedPrefabs.Length) return null;
+        if (rangedPrefabs == null || nextLevel - 1 >= rangedPrefabs.Length)
+        {
+            return null;
+        }
 
         return rangedPrefabs[nextLevel - 1];
     }
+
     public GridCell[] GetPlayerCells()
     {
         return playerCells;
@@ -316,21 +345,20 @@ public class GameManager : MonoBehaviour
             if (unit == null)
                 continue;
 
-            UnitCombat meleeCombat = unit.GetComponent<UnitCombat>();
+            InitializeCombat(unit);
 
-            if (meleeCombat != null)
+            if (unit.Combat != null)
             {
-                meleeCombat.StartCombat();
-            } 
+                unit.Combat.StartCombat();
+            }
 
-            RangedCombat rangedCombat = unit.GetComponent<RangedCombat>();
-
-            if (rangedCombat != null)
+            if (unit.RangedCombat != null)
             {
-                rangedCombat.StartCombat();
+                unit.RangedCombat.StartCombat();
             }
         }
     }
+
     public void CheckVictory()
     {
         if (battleEnded)
@@ -349,52 +377,61 @@ public class GameManager : MonoBehaviour
 
         battleEnded = true;
 
+        StartCoroutine(VictoryAfterDelay());
+    }
+
+    private IEnumerator VictoryAfterDelay()
+    {
+        yield return new WaitForSeconds(1f);
         Victory();
     }
+
     private void Victory()
     {
         GiveBattleReward(true);
 
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null) continue;
+            if (cell == null)
+                continue;
 
-            if (!cell.IsOccupied) continue;
+            if (!cell.IsOccupied)
+                continue;
 
             Unit unit = cell.currentUnit;
 
-            if (unit == null) continue;
+            if (unit == null)
+                continue;
 
-            UnitCombat meleeCombat = unit.GetComponent<UnitCombat>();
-
-            if (meleeCombat != null)
+            if (unit.Combat != null)
             {
-                meleeCombat.StopCombat();
+                unit.Combat.StopCombat();
             }
 
-            RangedCombat rangedCombat = unit.GetComponent<RangedCombat>();
-
-            if (rangedCombat != null)
+            if (unit.RangedCombat != null)
             {
-                rangedCombat.StopCombat();
+                unit.RangedCombat.StopCombat();
             }
         }
 
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null) continue;
+            if (cell == null)
+                continue;
 
-            if (!cell.IsOccupied) continue;
+            if (!cell.IsOccupied)
+                continue;
 
-            Animator animator = cell.currentUnit.GetComponent<Animator>();
+            Unit unit = cell.currentUnit;
 
-            if (animator != null)
+            if (unit == null)
+                continue;
+
+            if (unit.Animator != null)
             {
-                animator.ResetTrigger("Attack");
-
-                animator.SetBool("IsMoving",false);
-
-                animator.SetTrigger("Victory");
+                unit.Animator.ResetTrigger("Attack");
+                unit.Animator.SetBool("IsMoving", false);
+                unit.Animator.SetTrigger("Victory");
             }
         }
 
@@ -403,13 +440,16 @@ public class GameManager : MonoBehaviour
             victoryUI.ShowVictory();
         }
     }
+
     public void CheckDefeat()
     {
-        if (battleEnded) return;
+        if (battleEnded)
+            return;
 
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null) continue;
+            if (cell == null)
+                continue;
 
             if (cell.IsOccupied)
             {
@@ -419,12 +459,17 @@ public class GameManager : MonoBehaviour
 
         battleEnded = true;
 
+        StartCoroutine(DefeatAfterDelay());
+    }
+
+    private IEnumerator DefeatAfterDelay()
+    {
+        yield return new WaitForSeconds(1f);
         Defeat();
     }
 
     private void Defeat()
     {
-
         GiveBattleReward(false);
 
         isFighting = false;
@@ -434,32 +479,30 @@ public class GameManager : MonoBehaviour
             defeatUI.ShowDefeat();
         }
     }
+
     public void ResetPlayerForNextLevel()
     {
-
         foreach (GridCell cell in playerCells)
         {
-            if (cell == null) continue;
+            if (cell == null)
+                continue;
 
-            if (!cell.IsOccupied) continue;
+            if (!cell.IsOccupied)
+                continue;
 
             Unit unit = cell.currentUnit;
 
-            if (unit == null) continue;
+            if (unit == null)
+                continue;
 
-            UnitCombat meleeCombat = unit.GetComponent<UnitCombat>();
-
-            if (meleeCombat != null)
+            if (unit.Combat != null)
             {
-                meleeCombat.StopCombat();
+                unit.Combat.StopCombat();
             }
 
-
-            RangedCombat rangedCombat = unit.GetComponent<RangedCombat>();
-
-            if (rangedCombat != null)
+            if (unit.RangedCombat != null)
             {
-                rangedCombat.StopCombat();
+                unit.RangedCombat.StopCombat();
             }
 
             if (unit.currentCell != null)
@@ -472,16 +515,14 @@ public class GameManager : MonoBehaviour
                 unit.transform.rotation = unit.currentCell.transform.rotation;
             }
 
-            Animator animator = unit.GetComponent<Animator>();
-
-            if (animator != null)
+            if (unit.Animator != null)
             {
-                animator.ResetTrigger("Attack");
-                animator.ResetTrigger("Victory");
+                unit.Animator.ResetTrigger("Attack");
+                unit.Animator.ResetTrigger("Victory");
 
-                animator.SetBool("IsMoving", false);
+                unit.Animator.SetBool("IsMoving",false);
 
-                animator.Play("Idle", 0, 0f);
+                unit.Animator.Play("Idle", 0, 0f);
             }
         }
 
@@ -519,5 +560,48 @@ public class GameManager : MonoBehaviour
         }
 
         goldManager.AddGold(reward);
+    }
+
+    public void ClearData()
+    {
+        if (unitPool != null)
+        {
+            foreach (GridCell cell in playerCells)
+            {
+                if (cell == null)
+                {
+                    continue;
+                }
+
+                Unit unit = cell.currentUnit;
+
+                if (unit == null)
+                {
+                    continue;
+                }
+
+                unitPool.ReturnPlayerUnit(unit);
+            }
+        }
+
+        foreach (GridCell cell in playerCells)
+        {
+            if (cell == null)
+            {
+                continue;
+            }
+
+            cell.RemoveUnit();
+        }
+
+        playerSnapshot.Clear();
+
+        isFighting = false;
+        battleEnded = false;
+
+        if (goldManager != null)
+        {
+            goldManager.ClearData();
+        }
     }
 }

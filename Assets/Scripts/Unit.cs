@@ -20,6 +20,20 @@ public class Unit : MonoBehaviour
     public int damage = 10;
     public float attackCooldown = 0.8f;
 
+    // Components
+    public UnitHealth Health { get; private set; }
+    public UnitCombat Combat { get; private set; }
+    public RangedCombat RangedCombat { get; private set; }
+    public Animator Animator { get; private set; }
+
+    private void Awake()
+    {
+        Health = GetComponent<UnitHealth>();
+        Combat = GetComponent<UnitCombat>();
+        RangedCombat = GetComponent<RangedCombat>();
+        Animator = GetComponent<Animator>();
+    }
+
     public void SetCell(GridCell newCell)
     {
         if (newCell == null)
@@ -56,12 +70,9 @@ public class Unit : MonoBehaviour
 
         transform.rotation = Quaternion.identity;
 
-        UnitHealth health = GetComponent<UnitHealth>();
-
-
-        if (health != null)
+        if (Health != null)
         {
-            health.ResetHealth();
+            Health.ResetHealth();
         }
 
         Canvas healthBarCanvas = GetComponentInChildren<Canvas>();
@@ -71,31 +82,25 @@ public class Unit : MonoBehaviour
             healthBarCanvas.gameObject.SetActive(true);
         }
 
-        UnitCombat meleeCombat = GetComponent<UnitCombat>();
-
-        if (meleeCombat != null)
+        if (Combat != null)
         {
-            meleeCombat.StopCombat();
+            Combat.StopCombat();
         }
 
-        RangedCombat rangedCombat = GetComponent<RangedCombat>();
-
-        if (rangedCombat != null)
+        if (RangedCombat != null)
         {
-            rangedCombat.StopCombat();
+            RangedCombat.StopCombat();
         }
 
-        Animator animator = GetComponent<Animator>();
-
-        if (animator != null)
+        if (Animator != null)
         {
-            animator.ResetTrigger("Attack");
-            animator.ResetTrigger("Victory");
-            animator.ResetTrigger("Die");
+            Animator.ResetTrigger("Attack");
+            Animator.ResetTrigger("Victory");
+            Animator.ResetTrigger("Die");
 
-            animator.SetBool("IsMoving",false);
+            Animator.SetBool("IsMoving", false);
 
-            animator.Play("Idle",0, 0f);
+            Animator.Play("Idle", 0, 0f);
         }
     }
 }

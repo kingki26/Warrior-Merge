@@ -21,10 +21,7 @@ public class LevelDataReader : MonoBehaviour
             return;
         }
 
-        levelDatabase =
-            JsonUtility.FromJson<LevelDataList>(
-                jsonFile.text
-            );
+        levelDatabase =JsonUtility.FromJson<LevelDataList>(jsonFile.text);
 
         if (levelDatabase == null ||
             levelDatabase.levels == null)

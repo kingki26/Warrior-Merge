@@ -8,8 +8,6 @@ public class UnitCombat : MonoBehaviour
     [SerializeField] private float attackCooldown = 0.5f;
     [SerializeField] private int damage = 10;
 
-    private Animator animator;
-
     private float attackTimer;
 
     private bool isFighting;
@@ -19,18 +17,21 @@ public class UnitCombat : MonoBehaviour
     private Unit target;
 
     private GameManager gameManager;
+    private Animator animator;
     private UnitHealth health;
 
-    private void Awake()
+    public void Init(Unit unit, GameManager gameManager)
     {
-        unit = GetComponent<Unit>();
+        this.unit = unit;
+        this.gameManager = gameManager;
 
-        gameManager = FindAnyObjectByType<GameManager>();
-
-        animator = GetComponent<Animator>();
-
-        health = GetComponent<UnitHealth>();
+        if (unit != null)
+        {
+            animator = unit.Animator;
+            health = unit.Health;
+        }
     }
+
     public void StartCombat()
     {
         if (health != null && health.IsDead())
@@ -39,9 +40,7 @@ public class UnitCombat : MonoBehaviour
         }
 
         isFighting = true;
-
         attackTimer = 0f;
-
         target = null;
 
         FindClosestTarget();
@@ -55,13 +54,15 @@ public class UnitCombat : MonoBehaviour
             SetIdle();
         }
     }
+
     private void Update()
     {
         if (!isFighting)
+        {
             return;
+        }
 
-        if (health != null &&
-            health.IsDead())
+        if (health != null && health.IsDead())
         {
             return;
         }
@@ -69,7 +70,6 @@ public class UnitCombat : MonoBehaviour
         if (target == null || IsTargetDead())
         {
             target = null;
-
             FindClosestTarget();
         }
 
@@ -81,35 +81,40 @@ public class UnitCombat : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, target.transform.position);
 
-
         if (distance > attackRange)
         {
             SetMoving();
-
             MoveToTarget();
-
             return;
         }
 
         SetIdle();
-
         Attack();
     }
+
     private bool IsTargetDead()
     {
         if (target == null)
+        {
             return true;
+        }
 
         if (target.currentCell == null)
+        {
             return true;
+        }
 
         if (!target.gameObject.activeInHierarchy)
+        {
             return true;
+        }
 
-        UnitHealth targetHealth = target.GetComponent<UnitHealth>();
+        UnitHealth targetHealth = target.Health;
 
         if (targetHealth == null)
+        {
             return false;
+        }
 
         return targetHealth.IsDead();
     }
@@ -117,68 +122,80 @@ public class UnitCombat : MonoBehaviour
     private void FindClosestTarget()
     {
         if (gameManager == null)
+        {
             return;
+        }
 
         if (unit == null)
+        {
             return;
+        }
 
         if (unit.currentCell == null)
+        {
             return;
+        }
 
         GridCell[] targetCells;
-
 
         if (unit.currentCell.team == Team.Player)
         {
             targetCells = gameManager.GetEnemyCells();
         }
-
         else
         {
             targetCells = gameManager.GetPlayerCells();
         }
 
         if (targetCells == null)
+        {
             return;
+        }
 
         float closestDistance = Mathf.Infinity;
-
         target = null;
 
         foreach (GridCell cell in targetCells)
         {
             if (cell == null)
+            {
                 continue;
+            }
 
             if (!cell.IsOccupied)
+            {
                 continue;
+            }
 
-            Unit otherUnit =
-                cell.currentUnit;
+            Unit otherUnit = cell.currentUnit;
 
             if (otherUnit == null)
+            {
                 continue;
+            }
 
             if (otherUnit == unit)
+            {
                 continue;
+            }
 
-            UnitHealth otherHealth = otherUnit.GetComponent<UnitHealth>();
+            UnitHealth otherHealth = otherUnit.Health;
 
-            if (otherHealth != null &&
-                otherHealth.IsDead())
+            if (otherHealth != null && otherHealth.IsDead())
             {
                 continue;
             }
 
             if (!otherUnit.gameObject.activeInHierarchy)
+            {
                 continue;
+            }
 
             float distance = Vector3.Distance(transform.position, otherUnit.transform.position);
 
             if (distance < closestDistance)
             {
                 closestDistance = distance;
-
                 target = otherUnit;
             }
         }
@@ -187,26 +204,29 @@ public class UnitCombat : MonoBehaviour
     private void SetMoving()
     {
         if (isMoving)
+        {
             return;
+        }
 
         isMoving = true;
 
         if (animator == null)
+        {
             return;
+        }
 
         animator.ResetTrigger("Attack");
-
-        animator.SetBool("IsMoving",true);
-
+        animator.SetBool("IsMoving", true);
         animator.Play("Run", 0, 0f);
     }
+
     private void SetIdle()
     {
         if (!isMoving)
         {
             if (animator != null)
             {
-                animator.SetBool("IsMoving",false);
+                animator.SetBool("IsMoving", false);
             }
 
             return;
@@ -215,18 +235,21 @@ public class UnitCombat : MonoBehaviour
         isMoving = false;
 
         if (animator == null)
+        {
             return;
+        }
 
-        animator.SetBool( "IsMoving", false);
-
+        animator.SetBool("IsMoving", false);
         animator.ResetTrigger("Attack");
-
         animator.Play("Idle", 0, 0f);
     }
+
     private void MoveToTarget()
     {
         if (target == null)
+        {
             return;
+        }
 
         if (IsTargetDead())
         {
@@ -235,7 +258,6 @@ public class UnitCombat : MonoBehaviour
         }
 
         Vector3 direction = target.transform.position - transform.position;
-
         direction.y = 0f;
 
         if (direction.sqrMagnitude > 0.001f)
@@ -245,10 +267,13 @@ public class UnitCombat : MonoBehaviour
 
         transform.position = Vector3.MoveTowards(transform.position, target.transform.position, moveSpeed * Time.deltaTime);
     }
+
     private void Attack()
     {
         if (target == null)
+        {
             return;
+        }
 
         if (IsTargetDead())
         {
@@ -259,7 +284,9 @@ public class UnitCombat : MonoBehaviour
         attackTimer -= Time.deltaTime;
 
         if (attackTimer > 0f)
+        {
             return;
+        }
 
         attackTimer = attackCooldown;
 
@@ -268,7 +295,7 @@ public class UnitCombat : MonoBehaviour
             animator.SetTrigger("Attack");
         }
 
-        UnitHealth targetHealth = target.GetComponent<UnitHealth>();
+        UnitHealth targetHealth = target.Health;
 
         if (targetHealth != null)
         {
@@ -284,21 +311,18 @@ public class UnitCombat : MonoBehaviour
     public void StopCombat()
     {
         isFighting = false;
-
         target = null;
-
         attackTimer = 0f;
-
         isMoving = false;
 
         if (animator == null)
+        {
             return;
+        }
 
         animator.ResetTrigger("Attack");
         animator.ResetTrigger("Victory");
-
-        animator.SetBool( "IsMoving", false );
-
-        animator.Play( "Idle", 0, 0f);
+        animator.SetBool("IsMoving", false);
+        animator.Play("Idle", 0, 0f);
     }
 }
